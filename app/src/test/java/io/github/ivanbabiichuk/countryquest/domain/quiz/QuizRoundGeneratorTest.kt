@@ -43,7 +43,7 @@ class QuizRoundGeneratorTest {
                 }
 
                 val expectedText = when (mode) {
-                    QuizMode.CAPITAL -> question.country.capitals.single()
+                    QuizMode.CAPITAL -> question.country.capital
                     QuizMode.FLAG,
                     QuizMode.COUNTRY -> question.country.name
                 }
@@ -96,29 +96,38 @@ class QuizRoundGeneratorTest {
     }
 
     @Test
-    fun `capital mode excludes countries with multiple capitals`() {
-        val input = countries().take(10).mapIndexed { index, country ->
-            if (index == 0) {
-                country.copy(capitals = listOf("Capital A", "Capital B"))
-            } else {
-                country
+    fun `capital and country modes exclude missing or blank capitals`() {
+        for (capital in listOf(null, "", "   ")) {
+            val input = countries().take(10).mapIndexed { index, country ->
+                if (index == 0) country.copy(capital = capital) else country
+            }
+
+            for (mode in listOf(QuizMode.CAPITAL, QuizMode.COUNTRY)) {
+                val result = QuizRoundGenerator(Random(42)).generate(input, mode)
+
+                Assert.assertEquals(
+                    QuizGenerationResult.InsufficientCountries(9, 10),
+                    result,
+                )
             }
         }
+    }
 
-        val result = QuizRoundGenerator(Random(42))
-            .generate(input, QuizMode.CAPITAL)
+    @Test
+    fun `flag mode does not require a capital`() {
+        val input = countries().map { it.copy(capital = null) }
 
-        Assert.assertEquals(
-            QuizGenerationResult.InsufficientCountries(9, 10),
-            result,
-        )
+        val result = QuizRoundGenerator(Random(42)).generate(input, QuizMode.FLAG)
+
+        Assert.assertTrue(result is QuizGenerationResult.Success)
+        Assert.assertEquals(10, (result as QuizGenerationResult.Success).questions.size)
     }
 
     @Test
     fun `countries sharing a capital are excluded`() {
         val input = countries().take(11).mapIndexed { index, country ->
             if (index < 2) {
-                country.copy(capitals = listOf("Shared capital"))
+                country.copy(capital = "Shared capital")
             } else {
                 country
             }
@@ -140,7 +149,7 @@ class QuizRoundGeneratorTest {
             Country(
                 code = "TEST_$index",
                 name = "Country $index",
-                capitals = listOf("Capital $index"),
+                capital = "Capital $index",
                 region = "Test region",
                 languages = listOf("Test language"),
                 flagImage = "file:///android_asset/flags/test_$index.png",

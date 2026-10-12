@@ -155,7 +155,7 @@ class QuizViewModelTest {
             Country(
                 code = "TEST_$index",
                 name = "Country $index",
-                capitals = listOf("Capital $index"),
+                capital = "Capital $index",
                 region = "Test region",
                 languages = listOf("Test language"),
                 flagImage = "file:///android_asset/flags/test_$index.png",

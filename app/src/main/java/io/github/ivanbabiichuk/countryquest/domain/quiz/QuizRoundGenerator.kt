@@ -39,7 +39,7 @@ class QuizRoundGenerator(
                         AnswerOption(
                             id = country.code,
                             text = when (mode) {
-                                QuizMode.CAPITAL -> country.capitals.single()
+                                QuizMode.CAPITAL -> requireNotNull(country.capital)
                                 QuizMode.FLAG, QuizMode.COUNTRY -> country.name
                             }
                         )
@@ -67,12 +67,12 @@ class QuizRoundGenerator(
             return uniqueCountries.filter { !it.flagImage.isNullOrBlank() }
         }
 
-        val withSingleCapital = uniqueCountries.filter {
-            it.capitals.size == 1 && it.capitals.single().isNotBlank()
+        val withCapital = uniqueCountries.filter {
+            !it.capital.isNullOrBlank()
         }
 
-        val withUniqueCapital = withSingleCapital
-            .groupBy { normalize(it.capitals.single()) }
+        val withUniqueCapital = withCapital
+            .groupBy { normalize(requireNotNull(it.capital)) }
             .values
             .filter { it.size == 1 }
             .flatten()
