@@ -1,0 +1,42 @@
+# Gradle and Kotlin caches
+.gradle/
+.kotlin/
+
+# Build output (root and all modules)
+build/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.ap_
+
+# Local Android SDK and machine-specific configuration
+local.properties
+
+# Android Studio / IntelliJ local project metadata
+.idea/
+*.iml
+*.ipr
+*.iws
+captures/
+
+# Signing keys and private configuration
+*.jks
+*.keystore
+keystore.properties
+signing.properties
+secrets.properties
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Operating system files
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+
+# Keep Gradle Wrapper scripts, JAR and configuration under version control.
+# Keep gradle.properties, version catalogs and source assets under version control.
+# Store credentials outside tracked files; .gitignore is not a secrets scanner.
