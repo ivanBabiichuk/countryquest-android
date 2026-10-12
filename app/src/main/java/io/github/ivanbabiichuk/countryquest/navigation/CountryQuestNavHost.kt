@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import io.github.ivanbabiichuk.countryquest.feature.home.HomeScreen
 import io.github.ivanbabiichuk.countryquest.feature.quiz.QuizScreen
 import io.github.ivanbabiichuk.countryquest.feature.results.ResultsScreen
@@ -22,8 +23,8 @@ fun CountryQuestNavHost(
     ){
         composable <HomeRoute> {
             HomeScreen(
-                onStartQuiz = {
-                    navController.navigate(QuizRoute){
+                onStartQuiz = { mode ->
+                    navController.navigate(QuizRoute(mode)){
                         launchSingleTop = true
                     }
                 },
@@ -35,10 +36,13 @@ fun CountryQuestNavHost(
             )
         }
 
-        composable<QuizRoute> {
+        composable<QuizRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<QuizRoute>()
+
             QuizScreen(
+                mode = route.mode,
                 onFinishQuiz = {
-                    navController.navigate(ResultsRoute) {
+                    navController.navigate(ResultsRoute(route.mode)) {
                         popUpTo<QuizRoute> {
                             inclusive = true
                         }
@@ -48,10 +52,12 @@ fun CountryQuestNavHost(
             )
         }
 
-        composable<ResultsRoute> {
+        composable<ResultsRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<ResultsRoute>()
+
             ResultsScreen(
                 onPlayAgain = {
-                    navController.navigate(QuizRoute) {
+                    navController.navigate(QuizRoute(route.mode)) {
                         popUpTo<HomeRoute>()
                         launchSingleTop = true
                     }

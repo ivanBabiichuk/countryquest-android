@@ -12,10 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.github.ivanbabiichuk.countryquest.domain.model.QuizMode
 import io.github.ivanbabiichuk.countryquest.ui.theme.CountryQuestTheme
 
 @Composable
 fun QuizScreen(
+    mode: QuizMode,
     onFinishQuiz: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -24,7 +26,11 @@ fun QuizScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text(
-            text = "Quiz",
+            text = when (mode) {
+                QuizMode.FLAG -> "Guess the Flag"
+                QuizMode.CAPITAL -> "Guess the Capital"
+                QuizMode.COUNTRY -> "Guess the Country"
+            },
             style = MaterialTheme.typography.headlineLarge,
         )
 
@@ -42,6 +48,7 @@ private fun QuizScreenPreview() {
     CountryQuestTheme {
         Surface {
             QuizScreen(
+                QuizMode.FLAG,
                 onFinishQuiz = {},
                 modifier = Modifier.fillMaxSize()
             )

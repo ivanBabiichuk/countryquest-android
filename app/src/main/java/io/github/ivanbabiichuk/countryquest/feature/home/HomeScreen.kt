@@ -13,11 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.github.ivanbabiichuk.countryquest.domain.model.QuizMode
 import io.github.ivanbabiichuk.countryquest.ui.theme.CountryQuestTheme
 
 @Composable
 fun HomeScreen(
-    onStartQuiz: () -> Unit,
+    onStartQuiz: (QuizMode) -> Unit,
     onOpenStatistics: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -32,8 +33,27 @@ fun HomeScreen(
 
         Text("Explore. Guess. Learn.")
 
-        Button(onClick = onStartQuiz) {
-            Text("Start Quiz")
+        Text(
+            text = "Choose your challenge",
+            style = MaterialTheme.typography.titleMedium,
+        )
+
+        Button(
+            onClick = { onStartQuiz(QuizMode.FLAG) },
+        ) {
+            Text("Guess the Flag")
+        }
+
+        Button(
+            onClick = { onStartQuiz(QuizMode.CAPITAL) },
+        ) {
+            Text("Guess the Capital")
+        }
+
+        Button(
+            onClick = { onStartQuiz(QuizMode.COUNTRY) },
+        ) {
+            Text("Guess the Country")
         }
 
         OutlinedButton(onClick = onOpenStatistics) {
