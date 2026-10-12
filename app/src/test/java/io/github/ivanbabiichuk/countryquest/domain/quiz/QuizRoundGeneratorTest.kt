@@ -1,11 +1,8 @@
-package io.github.ivanbabiichuk.countryquest
+package io.github.ivanbabiichuk.countryquest.domain.quiz
 
 import io.github.ivanbabiichuk.countryquest.domain.model.Country
 import io.github.ivanbabiichuk.countryquest.domain.model.QuizMode
-import io.github.ivanbabiichuk.countryquest.domain.quiz.QuizGenerationResult
-import io.github.ivanbabiichuk.countryquest.domain.quiz.QuizRoundGenerator
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert
 import org.junit.Test
 import kotlin.random.Random
 
@@ -16,25 +13,25 @@ class QuizRoundGeneratorTest {
         for (mode in QuizMode.entries) {
             val result = QuizRoundGenerator(Random(42)).generate(countries(), mode)
 
-            assertTrue(result is QuizGenerationResult.Success)
+            Assert.assertTrue(result is QuizGenerationResult.Success)
 
             val questions = (result as QuizGenerationResult.Success).questions
 
-            assertEquals(10, questions.size)
-            assertEquals(10, questions.map { it.country.code }.distinct().size)
+            Assert.assertEquals(10, questions.size)
+            Assert.assertEquals(10, questions.map { it.country.code }.distinct().size)
 
             for (question in questions){
-                assertEquals(mode, question.mode)
-                assertEquals(4, question.options.size)
-                assertEquals(
+                Assert.assertEquals(mode, question.mode)
+                Assert.assertEquals(4, question.options.size)
+                Assert.assertEquals(
                     4,
                     question.options.map { it.id }.distinct().size,
                 )
-                assertEquals(
+                Assert.assertEquals(
                     4,
                     question.options.map { it.text }.distinct().size,
                 )
-                assertEquals(
+                Assert.assertEquals(
                     1,
                     question.options.count {
                         it.id == question.correctOptionId
@@ -51,7 +48,7 @@ class QuizRoundGeneratorTest {
                     QuizMode.COUNTRY -> question.country.name
                 }
 
-                assertEquals(expectedText, correctOption.text)
+                Assert.assertEquals(expectedText, correctOption.text)
             }
         }
     }
@@ -61,7 +58,7 @@ class QuizRoundGeneratorTest {
         val result = QuizRoundGenerator(Random(42))
             .generate(countries().take(9), QuizMode.FLAG)
 
-        assertEquals(
+        Assert.assertEquals(
             QuizGenerationResult.InsufficientCountries(
                 available = 9,
                 required = 10,
@@ -77,7 +74,7 @@ class QuizRoundGeneratorTest {
         val result = QuizRoundGenerator(Random(42))
             .generate(nineCountries + nineCountries, QuizMode.FLAG)
 
-        assertEquals(
+        Assert.assertEquals(
             QuizGenerationResult.InsufficientCountries(9, 10),
             result,
         )
@@ -92,7 +89,7 @@ class QuizRoundGeneratorTest {
         val result = QuizRoundGenerator(Random(42))
             .generate(input, QuizMode.FLAG)
 
-        assertEquals(
+        Assert.assertEquals(
             QuizGenerationResult.InsufficientCountries(9, 10),
             result,
         )
@@ -111,7 +108,7 @@ class QuizRoundGeneratorTest {
         val result = QuizRoundGenerator(Random(42))
             .generate(input, QuizMode.CAPITAL)
 
-        assertEquals(
+        Assert.assertEquals(
             QuizGenerationResult.InsufficientCountries(9, 10),
             result,
         )
@@ -131,7 +128,7 @@ class QuizRoundGeneratorTest {
             val result = QuizRoundGenerator(Random(42))
                 .generate(input, mode)
 
-            assertEquals(
+            Assert.assertEquals(
                 QuizGenerationResult.InsufficientCountries(9, 10),
                 result,
             )
