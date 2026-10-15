@@ -6,7 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import io.github.ivanbabiichuk.countryquest.feature.home.HomeScreen
+import io.github.ivanbabiichuk.countryquest.feature.home.HomeRouteContent
 import io.github.ivanbabiichuk.countryquest.feature.quiz.QuizScreen
 import io.github.ivanbabiichuk.countryquest.feature.results.ResultsScreen
 import io.github.ivanbabiichuk.countryquest.feature.statistics.StatisticsScreen
@@ -22,7 +22,7 @@ fun CountryQuestNavHost(
         modifier = modifier
     ){
         composable <HomeRoute> {
-            HomeScreen(
+            HomeRouteContent(
                 onStartQuiz = { mode ->
                     navController.navigate(QuizRoute(mode)){
                         launchSingleTop = true
