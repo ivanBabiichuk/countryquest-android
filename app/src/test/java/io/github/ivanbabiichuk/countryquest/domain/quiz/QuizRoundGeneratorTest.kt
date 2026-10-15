@@ -1,6 +1,7 @@
 package io.github.ivanbabiichuk.countryquest.domain.quiz
 
 import io.github.ivanbabiichuk.countryquest.domain.model.Country
+import io.github.ivanbabiichuk.countryquest.domain.model.CountryFlag
 import io.github.ivanbabiichuk.countryquest.domain.model.QuizMode
 import org.junit.Assert
 import org.junit.Test
@@ -83,7 +84,7 @@ class QuizRoundGeneratorTest {
     @Test
     fun `flag mode excludes countries without flag images`() {
         val input = countries().take(10).mapIndexed { index, country ->
-            if (index == 0) country.copy(flagImage = null) else country
+            if (index == 0) country.copy(flag = CountryFlag(svgUrl = null, pngUrl = null)) else country
         }
 
         val result = QuizRoundGenerator(Random(42))
@@ -144,6 +145,50 @@ class QuizRoundGeneratorTest {
         }
     }
 
+    @Test
+    fun `flag mode accepts SVG without PNG`() {
+        val input = countries().map { country ->
+            country.copy(flag = CountryFlag(
+                svgUrl = "https://example.com/flags/${country.code}.svg",
+                pngUrl = null,
+            ))
+        }
+
+        val result = QuizRoundGenerator(Random(42)).generate(input, QuizMode.FLAG)
+
+        Assert.assertTrue(result is QuizGenerationResult.Success)
+        Assert.assertEquals(10, (result as QuizGenerationResult.Success).questions.size)
+        Assert.assertTrue(result.questions.all { it.country.flag.pngUrl == null })
+    }
+
+    @Test
+    fun `flag mode accepts PNG without SVG`() {
+        val result = QuizRoundGenerator(Random(42)).generate(countries(), QuizMode.FLAG)
+
+        Assert.assertTrue(result is QuizGenerationResult.Success)
+        Assert.assertEquals(10, (result as QuizGenerationResult.Success).questions.size)
+        Assert.assertTrue(result.questions.all { it.country.flag.svgUrl == null })
+    }
+
+    @Test
+    fun `flag mode excludes countries when both formats are missing or blank`() {
+        val missingFlags = listOf(
+            CountryFlag(null, null),
+            CountryFlag("", null),
+            CountryFlag(null, " "),
+            CountryFlag(" ", ""),
+        )
+        for (flag in missingFlags) {
+            val input = countries().take(10).mapIndexed { index, country ->
+                if (index == 0) country.copy(flag = flag) else country
+            }
+
+            val result = QuizRoundGenerator(Random(42)).generate(input, QuizMode.FLAG)
+
+            Assert.assertEquals(QuizGenerationResult.InsufficientCountries(9, 10), result)
+        }
+    }
+
     private fun countries(): List<Country> =
         (1..12).map { index ->
             Country(
@@ -152,7 +197,10 @@ class QuizRoundGeneratorTest {
                 capital = "Capital $index",
                 region = "Test region",
                 languages = listOf("Test language"),
-                flagImage = "file:///android_asset/flags/test_$index.png",
+                flag = CountryFlag(
+                    svgUrl = null,
+                    pngUrl = "https://example.com/flags/test_$index.png",
+                ),
             )
         }
 }

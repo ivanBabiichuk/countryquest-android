@@ -19,5 +19,6 @@ data class LanguageDto(
 
 @Serializable
 data class FlagsDto(
-    val png: String? = null
+    val png: String? = null,
+    val svg: String? = null
 )

@@ -64,7 +64,9 @@ class QuizRoundGenerator(
             .distinctBy { normalize(it.name) }
 
         if (mode == QuizMode.FLAG) {
-            return uniqueCountries.filter { !it.flagImage.isNullOrBlank() }
+            return uniqueCountries.filter {
+                !it.flag.svgUrl.isNullOrBlank() || !it.flag.pngUrl.isNullOrBlank()
+            }
         }
 
         val withCapital = uniqueCountries.filter {

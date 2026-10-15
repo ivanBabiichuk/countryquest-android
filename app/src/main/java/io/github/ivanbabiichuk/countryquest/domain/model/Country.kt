@@ -6,5 +6,10 @@ data class Country(
     val capital: String?,
     val region: String,
     val languages: List<String>,
-    val flagImage: String?
+    val flag: CountryFlag
+)
+
+data class CountryFlag(
+    val svgUrl: String?,
+    val pngUrl: String?
 )

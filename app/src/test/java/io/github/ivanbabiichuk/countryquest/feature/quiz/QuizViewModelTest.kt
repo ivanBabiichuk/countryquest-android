@@ -1,6 +1,7 @@
 package io.github.ivanbabiichuk.countryquest.feature.quiz
 
 import io.github.ivanbabiichuk.countryquest.domain.model.Country
+import io.github.ivanbabiichuk.countryquest.domain.model.CountryFlag
 import io.github.ivanbabiichuk.countryquest.domain.model.QuizMode
 import io.github.ivanbabiichuk.countryquest.domain.quiz.QuizRoundGenerator
 import org.junit.Assert.assertEquals
@@ -158,7 +159,10 @@ class QuizViewModelTest {
                 capital = "Capital $index",
                 region = "Test region",
                 languages = listOf("Test language"),
-                flagImage = "file:///android_asset/flags/test_$index.png",
+                flag = CountryFlag(
+                    svgUrl = null,
+                    pngUrl = "https://example.com/flags/test_$index.png",
+                ),
             )
         }
 }

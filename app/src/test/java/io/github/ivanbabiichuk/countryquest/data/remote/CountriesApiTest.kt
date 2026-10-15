@@ -1,6 +1,7 @@
 package io.github.ivanbabiichuk.countryquest.data.remote
 
 import io.github.ivanbabiichuk.countryquest.app.di.NetworkModule
+import io.github.ivanbabiichuk.countryquest.data.mapper.toDomainOrNull
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerializationException
 import okhttp3.mockwebserver.MockResponse
@@ -78,6 +79,8 @@ class CountriesApiTest {
             country.flags?.png,
         )
 
+        assertEquals("https://flagcdn.com/ua.svg", country.flags?.svg)
+
         val request = server.takeRequest(1, TimeUnit.SECONDS)
         assertEquals("GET", request?.method)
         assertEquals("/countries", request?.path)
@@ -136,6 +139,90 @@ class CountriesApiTest {
             fail("Expected serialization error")
         } catch (_: SerializationException) {
             // Очікувано: немає обов'язкового alpha2Code.
+        }
+    }
+
+    @Test
+    fun `UTF-8 response preserves accents through domain mapping`() = runBlocking {
+        server.enqueue(
+            MockResponse()
+                .setHeader("Content-Type", "application/json")
+                .setBody(
+                    """
+                    [{
+                      "alpha2Code": "MD",
+                      "name": "Moldova",
+                      "capital": "Chișinău",
+                      "flag": "🇲🇩",
+                      "languages": [{"name": "Română"}]
+                    }]
+                    """.trimIndent(),
+                ),
+        )
+
+        val country = requireNotNull(api.getCountries().single().toDomainOrNull())
+
+        assertEquals("Chișinău", country.capital)
+        assertEquals(listOf("Română"), country.languages)
+    }
+    @Test
+    fun `parses flags with only SVG or only PNG`() = runBlocking {
+        server.enqueue(
+            MockResponse()
+                .setHeader("Content-Type", "application/json")
+                .setBody(
+                    """
+                    [
+                      {"alpha2Code":"UA","name":"Ukraine",
+                       "flags":{"svg":"https://flagcdn.com/ua.svg"}},
+                      {"alpha2Code":"MD","name":"Moldova",
+                       "flags":{"png":"https://flagcdn.com/w320/md.png"}}
+                    ]
+                    """.trimIndent(),
+                ),
+        )
+
+        val countries = api.getCountries()
+
+        assertEquals(2, countries.size)
+        val svgOnly = countries[0]
+        assertEquals("https://flagcdn.com/ua.svg", svgOnly.flags?.svg)
+        assertNull(svgOnly.flags?.png)
+        val svgCountry = requireNotNull(svgOnly.toDomainOrNull())
+        assertEquals("https://flagcdn.com/ua.svg", svgCountry.flag.svgUrl)
+        assertNull(svgCountry.flag.pngUrl)
+
+        val pngOnly = countries[1]
+        assertEquals("https://flagcdn.com/w320/md.png", pngOnly.flags?.png)
+        assertNull(pngOnly.flags?.svg)
+        val pngCountry = requireNotNull(pngOnly.toDomainOrNull())
+        assertEquals("https://flagcdn.com/w320/md.png", pngCountry.flag.pngUrl)
+        assertNull(pngCountry.flag.svgUrl)
+    }
+
+    @Test
+    fun `parses null and empty flags without losing the country`() = runBlocking {
+        server.enqueue(
+            MockResponse().setBody(
+                """
+                [
+                  {"alpha2Code":"UA","name":"Ukraine","flags":null},
+                  {"alpha2Code":"MD","name":"Moldova","flags":{}},
+                  {"alpha2Code":"PL","name":"Poland","flags":{"png":null,"svg":null}}
+                ]
+                """.trimIndent(),
+            ),
+        )
+
+        val countries = api.getCountries()
+        assertEquals(3, countries.size)
+        assertNull(countries[0].flags)
+        for (dto in countries) {
+            assertNull(dto.flags?.png)
+            assertNull(dto.flags?.svg)
+            val country = requireNotNull(dto.toDomainOrNull())
+            assertNull(country.flag.pngUrl)
+            assertNull(country.flag.svgUrl)
         }
     }
 }
