@@ -13,9 +13,9 @@ interface CountryDao {
     fun observeCountries(): Flow<List<CountryEntity>>
 
     @Query("SELECT * FROM countries ORDER BY code")
-    fun getCountries(): List<CountryEntity>
+    suspend fun getCountries(): List<CountryEntity>
 
     @Upsert
-    fun upsertCountries(countries: List<CountryEntity>)
+    suspend fun upsertCountries(countries: List<CountryEntity>)
 
 }
