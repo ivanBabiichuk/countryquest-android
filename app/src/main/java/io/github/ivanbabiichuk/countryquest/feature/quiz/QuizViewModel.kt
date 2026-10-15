@@ -1,52 +1,74 @@
 package io.github.ivanbabiichuk.countryquest.feature.quiz
 
+import android.util.Log
 import androidx.annotation.MainThread
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.github.ivanbabiichuk.countryquest.domain.model.Country
 import io.github.ivanbabiichuk.countryquest.domain.model.QuizAnswer
 import io.github.ivanbabiichuk.countryquest.domain.model.QuizMode
 import io.github.ivanbabiichuk.countryquest.domain.quiz.QuizGenerationResult
 import io.github.ivanbabiichuk.countryquest.domain.quiz.QuizRoundGenerator
+import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 @HiltViewModel
 class QuizViewModel @Inject constructor(
-    private val roundGenerator: QuizRoundGenerator
+    private val roundGenerator: QuizRoundGenerator,
+    private val countryRepository: CountryRepository
 ): ViewModel() {
+
+    private companion object {
+        const val TAG = "QuizViewModel"
+    }
 
     private val _uiState = MutableStateFlow<QuizUiState>(QuizUiState.Idle)
     val uiState: StateFlow<QuizUiState> = _uiState.asStateFlow()
 
     @MainThread
-    fun startRound(
-        countries: List<Country>,
-        mode: QuizMode
-    ) {
+    fun startRound(mode: QuizMode) {
         when (_uiState.value) {
             QuizUiState.Idle,
+            QuizUiState.LoadError,
             is QuizUiState.NotEnoughCountries -> Unit
 
+            QuizUiState.Loading,
             is QuizUiState.Active,
             is QuizUiState.Finished -> return
         }
 
-        _uiState.value = when (val result = roundGenerator.generate(countries, mode)) {
-            is QuizGenerationResult.Success -> {
-                QuizUiState.Active(
-                    questions = result.questions,
-                )
+        _uiState.value = QuizUiState.Loading
+
+        viewModelScope.launch {
+            val countries = try {
+                countryRepository.getCountries()
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                Log.e(TAG, "Failed to load countries for quiz", exception)
+                _uiState.value = QuizUiState.LoadError
+                return@launch
             }
 
-            is QuizGenerationResult.InsufficientCountries -> {
-                QuizUiState.NotEnoughCountries(
-                    available = result.available,
-                    required = result.required,
-                )
+            _uiState.value = when (
+                val result = roundGenerator.generate(countries, mode)
+            ) {
+                is QuizGenerationResult.Success -> {
+                    QuizUiState.Active(questions = result.questions)
+                }
+
+                is QuizGenerationResult.InsufficientCountries -> {
+                    QuizUiState.NotEnoughCountries(
+                        available = result.available,
+                        required = result.required
+                    )
+                }
             }
         }
     }

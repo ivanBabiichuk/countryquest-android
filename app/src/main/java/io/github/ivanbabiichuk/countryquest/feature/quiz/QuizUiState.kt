@@ -8,6 +8,10 @@ sealed interface QuizUiState {
 
     data object Idle: QuizUiState
 
+    data object Loading : QuizUiState
+
+    data object LoadError : QuizUiState
+
     data class NotEnoughCountries(
         val available: Int,
         val required: Int
