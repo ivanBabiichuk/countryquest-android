@@ -1,107 +1,243 @@
 # CountryQuest
 
-An Android geography quiz about flags, capitals, and countries.
+Learn geography through short quizzes about flags, capitals, and countries.
 
-CountryQuest is a personal product being built with Kotlin and Jetpack Compose. The first release is planned around short, ten-question rounds, local statistics, and a REST API with offline support.
+CountryQuest is a personal Android product built with Kotlin and Jetpack Compose. It combines a REST API, a local Room catalog, reactive UI state, and a quiz engine in a single-module application with separate presentation, domain, and data packages.
 
-> **Status: initial project setup.** The repository currently contains the Android Studio starter Activity, Compose theme, and template tests. Gameplay, API integration, persistence, and statistics are not implemented yet.
+> **Status: playable v1.0 prototype, under active development.** Three quiz modes, catalog synchronization, flag loading, and round results work. Persistent game history, real statistics, and guaranteed offline flag availability are still planned.
 
-## Planned v1.0 experience
+The app UI is in English. Accounts, ads, analytics, and a custom backend are outside the v1.0 scope.
 
-- **Guess the Flag:** identify a country from its flag.
-- **Guess the Capital:** choose a country's capital.
-- **Guess the Country:** identify a country from its capital, region, and languages.
-- Ten questions per round, four answer options, and one correct answer.
-- Answer feedback and a short country fact.
-- Results and statistics for completed rounds.
-- Country data updates through a REST API, with a local seed catalog and offline flags.
+## Gameplay
 
-The four main screens are **Home**, **Quiz**, **Results**, and **Statistics**. App UI is in English. Accounts, ads, and a custom backend are outside the v1.0 scope.
+| Mode | Challenge |
+| --- | --- |
+| Guess the Flag | Identify a country from its flag. |
+| Guess the Capital | Choose the capital of a named country. |
+| Guess the Country | Identify a country from its capital, region, and languages. |
+
+Each round contains **10 questions**, with **4 answer options** and one correct answer per question. Target countries do not repeat within a round. A correct answer earns one point; the final score ranges from 0 to 10. There is no timer or score penalty.
+
+After answering, the screen reveals the correct option and country details. Answers cannot be changed, and the next question becomes available only after an answer. Results show the score and offer **Play Again** or **Back to Home**.
+
+The generator filters countries according to the selected mode. Countries with ambiguous shared capitals are excluded from capital-based questions. If fewer than ten eligible countries remain, the app shows an insufficient-catalog state instead of generating a partial round.
+
+## Current features
+
+| Area | Implemented behavior |
+| --- | --- |
+| Home | Mode selection, saved-country count, manual catalog update, and loading/error feedback. |
+| Quiz | Three modes, progress, score, answer feedback, and country details. |
+| Results | Completed-round score, replay, and return to Home. Results are not persisted. |
+| Statistics | Navigation and a placeholder screen only. |
+| Country catalog | API download, validation, partial updates, Room persistence, and reactive observation. |
+| Synchronization | Startup refresh attempt, manual retry, shared refresh state, and concurrent-request protection. |
+| Flags | SVG preferred, PNG fallback, loading/error states, and retry. Answers stay disabled until the flag loads. |
+| Tests | Domain, API, repository, Room, synchronization, ViewModel, Compose UI, and image-loading tests. |
+
+## Architecture
+
+The project uses one `:app` module with package boundaries. ViewModels expose UI state to Compose; domain models and repository interfaces separate gameplay from persistence and networking. Hilt supplies dependencies.
+
+```text
+io.github.ivanbabiichuk.countryquest
+├── MainActivity.kt
+├── app/
+│   ├── CountryQuestApplication.kt   # Hilt application and Coil ImageLoader
+│   ├── CountryQuestApp.kt
+│   ├── AppViewModel.kt              # Startup catalog initialization
+│   ├── di/                         # Network, database, repository, quiz bindings
+│   └── sync/                       # Shared catalog synchronization state
+├── data/
+│   ├── remote/                     # Retrofit API and DTOs
+│   ├── local/                      # Room database, DAO, entity, converter
+│   ├── mapper/                     # DTO/domain/entity conversion
+│   └── repository/                 # OfflineFirstCountryRepository
+├── domain/
+│   ├── model/                      # Countries, flags, questions, answers, modes
+│   ├── quiz/                       # Round generation and eligibility rules
+│   └── repository/                 # Repository contract and refresh results
+├── feature/
+│   ├── home/
+│   ├── quiz/                       # Includes CountryFlagImage
+│   ├── results/
+│   └── statistics/
+├── navigation/                     # Serializable routes and navigation host
+└── ui/theme/                       # Compose theme
+```
+
+### Catalog and game data flow
+
+```text
+Startup / manual update
+        ↓
+CountrySyncCoordinator → CountryRepository.refreshCountries()
+        ↓
+Retrofit + OkHttp → Country DTOs → validation / mapping → Room upsert
+                                                           ↓
+                                              Room Flow → HomeViewModel → Home
+                                                           ↓
+                                              Catalog snapshot → QuizRoundGenerator
+                                                           ↓
+                                                   QuizViewModel → Quiz
+                                                                       ↓
+                                                                    Results
+```
+
+Room is the source for catalog reads. Starting a round loads a snapshot from Room; subsequent catalog updates do not change that round's questions or answers.
+
+`CountrySyncCoordinator` attempts automatic refresh once per process when initialized. Manual refresh remains available after success or failure. Duplicate refresh actions are ignored while a refresh is running. The repository also serializes refresh operations.
+
+### Validation and update policy
+
+- DTOs are mapped to app-owned models. The API's `capital` field is represented as a nullable string.
+- Invalid required country fields reject that record. Optional fields are normalized, and invalid flag URLs are discarded.
+- Identical records with the same country code are collapsed. Conflicting records with the same code are skipped.
+- Valid records are upserted in a Room transaction, and the skipped-record count is exposed to the UI.
+- Countries missing from an update are retained in the existing catalog.
+- An entirely unusable response or a network, HTTP, parsing, or database failure preserves the previous catalog.
+
+Record filtering applies after successful JSON decoding. A response that cannot be decoded is rejected as a whole.
+
+### Flag loading and networking
+
+Coil uses the application's shared OkHttp client and an SVG decoder. `CountryFlagImage` tries distinct, nonblank URLs in **SVG → PNG** order. If both fail, it shows **Try again**, which restarts from the first source.
+
+Requests include a descriptive `CountryQuest/<version>` User-Agent with the repository URL. Debug builds log HTTP requests and response bodies, with `Authorization`, `Cookie`, and `Set-Cookie` headers redacted. The HTTP logging interceptor is omitted from release builds.
+
+## Offline behavior and current limitations
+
+The local catalog survives app restarts. After a successful download, text-based quizzes can use saved countries without a network connection, and a failed refresh does not remove them.
+
+Full offline support is not finished:
+
+- A fresh installation needs a successful catalog download; no bundled seed catalog exists yet.
+- Flags use remote URLs and Coil caching. Cached images are not a guarantee that every flag will be available offline.
+- If all flag sources fail, answers remain disabled. The user can retry or return Home; automatic question replacement is not implemented.
+- Completed rounds and answers are not stored in Room. Statistics are still a placeholder.
+- Active rounds are held in a ViewModel; restoration after process death is not implemented.
+- Catalog freshness timestamps, scheduled synchronization, and app-level retry/backoff policies are not implemented.
 
 ## Technology
 
-**Currently configured:** Kotlin, Jetpack Compose, Material 3, Gradle Kotlin DSL, a version catalog, and template JUnit / Android instrumentation tests.
+| Responsibility | Implementation |
+| --- | --- |
+| Language and build | Kotlin, Gradle Kotlin DSL, version catalog |
+| UI | Jetpack Compose, Material 3 |
+| State | ViewModel, Kotlin Coroutines, Flow / StateFlow |
+| Navigation | Navigation Compose with serializable routes |
+| Dependency injection | Hilt, KSP |
+| Networking | Retrofit, OkHttp |
+| JSON | kotlinx.serialization |
+| Local database | Room, exported schemas |
+| Images | Coil 3, OkHttp network fetcher, SVG decoder |
+| Testing | JUnit 4, MockWebServer, AndroidX Test, Compose UI tests, test fakes |
 
-**Planned:** ViewModel with Coroutines and Flow, Navigation Compose, Hilt, Room, Retrofit / OkHttp, Coil, DataStore, MockK, and MockWebServer.
-
-Dependency versions are maintained in [`gradle/libs.versions.toml`](gradle/libs.versions.toml).
+Dependency versions live in [`gradle/libs.versions.toml`](gradle/libs.versions.toml). Room schemas live in [`app/schemas`](app/schemas). DataStore and MockK are not currently used.
 
 ## Run locally
 
-1. Open this repository's root directory in Android Studio.
-2. Install the Android SDK required by `app/build.gradle.kts` using SDK Manager. The current project uses compile / target SDK **37** and minimum SDK **24** (Android 7.0).
-3. Use a Gradle JDK compatible with the configured Android Gradle Plugin and Gradle Wrapper. Android Studio's bundled JDK is the starting point; check compatibility if sync reports a mismatch. Java source compatibility is not the same as the JDK required to run Gradle.
-4. Let Gradle sync finish, then run the `app` configuration on an emulator or device with API 24 or higher.
+```sh
+git clone https://github.com/ivanBabiichuk/countryquest-android.git
+cd countryquest-android
+```
 
-The current starter app needs no API credentials. First-time dependency downloads require an internet connection.
+1. Open the repository root in Android Studio.
+2. Install **Android SDK 37** using SDK Manager. The app targets SDK 37 and supports **API 24+** (Android 7.0+).
+3. Let Gradle sync finish. The repository uses Gradle **9.5.0** and AGP **9.3.3**. Checked-in [daemon JVM criteria](gradle/gradle-daemon-jvm.properties) request **JDK 25**; allow toolchain provisioning or provide a matching installation. Java source/target compatibility is 11, which is separate from the Gradle daemon JDK.
+4. Start an emulator or connect an Android device, then run the `app` configuration.
+5. On first launch, allow the country catalog to download. Use the Home update/retry action if the request fails.
 
-From the project root, with a compatible JDK and Android SDK configured:
+No API key or account is required for the configured country endpoint. Internet access is needed for initial dependency/toolchain downloads and the first country download.
+
+Build from the repository root:
 
 ```sh
 ./gradlew :app:assembleDebug
-./gradlew :app:testDebugUnitTest
-./gradlew :app:lintDebug
 ```
 
-Instrumentation tests require a running emulator or connected device:
+On Windows, use `gradlew.bat`. Keep the local SDK path in an untracked `local.properties` file when needed.
+
+### Quick demo
+
+1. Open Home and wait for the saved-country count to appear.
+2. Choose a mode and complete ten questions.
+3. View the score and use Play Again.
+4. Return Home and update the catalog; inspect `okhttp.OkHttpClient` in Logcat in a debug build.
+5. After the catalog has been saved, disable networking and try a capital-based round to explore local-data behavior.
+
+Flag questions may still need a network connection, as described above.
+
+## Testing
+
+Run local JVM tests:
+
+```sh
+./gradlew :app:testDebugUnitTest
+```
+
+Run Android instrumentation tests with an emulator or device connected:
 
 ```sh
 ./gradlew :app:connectedDebugAndroidTest
 ```
 
-On Windows, use `gradlew.bat`. These commands are provided for local verification; this README does not claim a successful build or CI run. Existing tests are template examples, not coverage of the planned quiz features.
+Run static Android checks separately:
 
-## Architecture direction
-
-Start with one `:app` module and clear package boundaries:
-
-```text
-io.github.ivanbabiichuk.countryquest
-├── app/           # Application, Activity, dependency injection
-├── core/          # Shared UI and utilities
-├── data/          # API, Room, seed catalog, mappers, repository implementations
-├── domain/        # Models, quiz engine, use cases, repository interfaces
-├── feature/       # Home, Quiz, Results, Statistics
-└── navigation/    # Routes and navigation host
+```sh
+./gradlew :app:lintDebug
 ```
 
-This is the target structure, not the current starter layout. Code dependencies point **Presentation → Domain ← Data**; Hilt will connect implementations to domain interfaces.
+| Suite | Covered scenarios |
+| --- | --- |
+| JVM | Round generation, eligibility, DTO mapping, API parsing and failures, partial catalog updates, synchronization coordination, User-Agent, and logging behavior. |
+| Android | Real Room reads/writes and rollback, Home/Quiz ViewModels, Home UI states, and flag loading with real Coil decoders. |
+| Flag regression tests | SVG success, PNG fallback after HTTP or decoding failure, retry recovery, missing/duplicate URLs, country changes, and answer availability after recovery. |
 
-Planned data flow:
+API tests use MockWebServer. Flag tests supply controlled HTTP responses through a test interceptor while retaining the production image-loader factory and real SVG/PNG decoders. They do not depend on live Wikimedia or FlagCDN availability.
 
-```text
-Country API → DTO validation / mapping → Repository → Room → Flow → ViewModel → Compose
-Local seed ─────────────────────────────────────────→ Room
-```
+**Latest local verification — 16 October 2026:** 58 JVM debug tests and 41 Android tests passed on a Pixel 10 Pro emulator running Android 17 / API 37. Four targeted networking tests also passed for release using a temporary Gradle init script to enable release unit tests; that script is not part of the repository. These counts include the original template tests and describe local verification, not CI or a coverage percentage. Lint is listed as a runnable check, not as a verified result of that run.
 
-Room will provide the UI's local source of data. Failed updates must preserve the last usable catalog. Active rounds will keep a question snapshot so synchronization cannot change an answer mid-game. Offline flags must use bundled assets or persistent storage, rather than relying only on an evictable image cache.
+## Remaining v1.0 milestones
 
-A completed round and its ten answers will be saved atomically. Answer history will support a future Practice Your Mistakes mode.
+- [ ] Persist completed rounds and answers atomically, with protection against duplicate saves.
+- [ ] Implement statistics and game history from saved results.
+- [ ] Add a bundled country catalog and reliable offline flag assets.
+- [ ] Track catalog freshness and complete synchronization behavior.
+- [ ] Provide a recovery path when no flag source is available.
+- [ ] Finish lifecycle recovery, accessibility, animations, and visual polish.
+- [ ] Complete release validation, screenshots, signing, and third-party notices.
 
-## Design and planning
-
-- [Product plan and architecture in Penpot](https://design.penpot.app/#/workspace?team-id=17193a1f-939a-80b5-8008-c6314074a7a3&file-id=52a5041f-08a1-80f1-8008-c63e8a28e875&page-id=52a5041f-08a1-80f1-8008-c63e8a28e876)
-- [v1.0 screen designs in Penpot](https://design.penpot.app/#/workspace?team-id=17193a1f-939a-80b5-8008-c6314074a7a3&file-id=52a5041f-08a1-80f1-8008-c63e8a28e875&page-id=d938f842-ed1c-801a-8008-c647e0a1d33c)
-
-Penpot links may require sign-in and file access. Design mockups do not represent implemented screens.
-
-The initial estimate is ten working days, including dedicated time for API integration, synchronization, and network testing. It is a planning estimate, not a promised publication date.
+Answer history is intended to support Practice Your Mistakes in a later release.
 
 ## Roadmap
 
-| Version | Planned scope |
+| Version | Scope |
 | --- | --- |
-| 1.0 | Three quiz modes, results, statistics, API synchronization, offline support |
-| 1.1 | Continent filters and difficulty |
-| 1.2 | Adventure progression, levels, XP, and stars |
-| 1.3 | Country collection and discovery progress |
-| 1.4 | Daily Challenge and achievements |
-| 1.5 | Practice Your Mistakes |
+| **1.0 — Quiz Edition** | Three quiz modes, results, statistics, API synchronization, offline support, and tests. **In progress.** |
+| 1.1 — Explore | Continent filters and difficulty. |
+| 1.2 — Adventure | Levels, XP, stars, and progression. |
+| 1.3 — Discovery | Country collection and discovery progress. |
+| 1.4 — Challenges | Daily Challenge and achievements. |
+| 1.5 — Learning | Practice Your Mistakes. |
+
+Future versions describe product direction, not committed release dates.
+
+## Design and planning
+
+- [Product planning and architecture in Penpot](https://design.penpot.app/#/workspace?team-id=17193a1f-939a-80b5-8008-c6314074a7a3&file-id=52a5041f-08a1-80f1-8008-c63e8a28e875&page-id=52a5041f-08a1-80f1-8008-c63e8a28e876)
+- [v1.0 screen designs in Penpot](https://design.penpot.app/#/workspace?team-id=17193a1f-939a-80b5-8008-c6314074a7a3&file-id=52a5041f-08a1-80f1-8008-c63e8a28e875&page-id=d938f842-ed1c-801a-8008-c647e0a1d33c)
+
+Planning labels are Ukrainian; application UI labels are English. Penpot may require sign-in and file access. Designs describe the target experience and may differ from the current prototype.
 
 ## Data sources and attribution
 
-The planned providers are [countries.dev](https://countries.dev/docs) for country data and [FlagCDN / Flagpedia](https://flagpedia.net/download/api) for flags. Their API contracts, dataset suitability, and redistribution / attribution requirements must be checked when integrating them. Maintain the required notices with any bundled data and flag assets before release.
+Country data is fetched from [`GET https://countries.dev/countries`](https://countries.dev/countries). See the [countries.dev documentation](https://countries.dev/docs) for the provider's API details.
+
+Flag URLs are supplied by the country response and can point to different hosts, including [FlagCDN / Flagpedia](https://flagpedia.net/download/api) and Wikimedia Commons. The app does not assume every flag is hosted by the same service. Data normalization does not independently verify geographic accuracy or remote image availability.
+
+Provider and asset attribution, licenses, and any modifications to bundled data must be documented before distributing the planned offline catalog and flags. In-app third-party notices are still a release task.
 
 ## License
 
-A source-code license has not been selected yet. Third-party libraries, data, and flag assets remain subject to their respective licenses. This repository does not grant additional rights to those materials.
+No source-code license has been added to this repository yet. Third-party libraries, country data, and flag assets remain subject to their respective terms.
