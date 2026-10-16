@@ -17,9 +17,11 @@ import io.github.ivanbabiichuk.countryquest.ui.theme.CountryQuestTheme
 
 @Composable
 fun ResultsScreen(
+    score: Int,
+    totalQuestions: Int,
     onPlayAgain: () -> Unit,
     onGoHome: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier.padding(24.dp),
@@ -30,7 +32,12 @@ fun ResultsScreen(
             style = MaterialTheme.typography.headlineLarge,
         )
 
-        Text("Your round summary will appear here.")
+        Text(
+            text = "$score / $totalQuestions",
+            style = MaterialTheme.typography.displayMedium
+        )
+
+        Text("Correct answers")
 
         Button(onClick = onPlayAgain) {
             Text("Play Again")
@@ -48,6 +55,8 @@ private fun ResultsScreenPreview() {
     CountryQuestTheme {
         Surface {
             ResultsScreen(
+                score = 7,
+                totalQuestions = 10,
                 onPlayAgain = {},
                 onGoHome = {},
                 modifier = Modifier.fillMaxSize()

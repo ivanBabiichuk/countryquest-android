@@ -7,7 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import io.github.ivanbabiichuk.countryquest.feature.home.HomeRouteContent
-import io.github.ivanbabiichuk.countryquest.feature.quiz.QuizScreen
+import io.github.ivanbabiichuk.countryquest.feature.quiz.QuizRouteContent
 import io.github.ivanbabiichuk.countryquest.feature.results.ResultsScreen
 import io.github.ivanbabiichuk.countryquest.feature.statistics.StatisticsScreen
 
@@ -32,23 +32,32 @@ fun CountryQuestNavHost(
                     navController.navigate(StatisticsRoute){
                         launchSingleTop = true
                     }
-                },
+                }
             )
         }
 
         composable<QuizRoute> { backStackEntry ->
             val route = backStackEntry.toRoute<QuizRoute>()
 
-            QuizScreen(
+            QuizRouteContent(
                 mode = route.mode,
-                onFinishQuiz = {
-                    navController.navigate(ResultsRoute(route.mode)) {
+                onFinishQuiz = { score, totalQuestions ->
+                    navController.navigate(
+                        ResultsRoute(
+                            mode = route.mode,
+                            score = score,
+                            totalQuestions = totalQuestions,
+                        )
+                    ) {
                         popUpTo<QuizRoute> {
                             inclusive = true
                         }
                         launchSingleTop = true
                     }
                 },
+                onExitQuiz = {
+                    navController.popBackStack<HomeRoute>(inclusive = false)
+                }
             )
         }
 
@@ -56,6 +65,8 @@ fun CountryQuestNavHost(
             val route = backStackEntry.toRoute<ResultsRoute>()
 
             ResultsScreen(
+                score = route.score,
+                totalQuestions = route.totalQuestions,
                 onPlayAgain = {
                     navController.navigate(QuizRoute(route.mode)) {
                         popUpTo<HomeRoute>()
@@ -63,18 +74,14 @@ fun CountryQuestNavHost(
                     }
                 },
                 onGoHome = {
-                    navController.popBackStack<HomeRoute>(
-                        inclusive = false,
-                    )
-                },
+                    navController.popBackStack<HomeRoute>(inclusive = false)
+                }
             )
         }
 
         composable<StatisticsRoute> {
             StatisticsScreen(
-                onGoBack = {
-                    navController.popBackStack()
-                },
+                onGoBack = { navController.popBackStack() }
             )
         }
     }

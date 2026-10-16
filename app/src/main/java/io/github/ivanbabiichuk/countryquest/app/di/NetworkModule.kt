@@ -33,6 +33,18 @@ object NetworkModule {
             .connectTimeout(15, TimeUnit.SECONDS)
             .readTimeout(20, TimeUnit.SECONDS)
             .callTimeout(30, TimeUnit.SECONDS)
+            .addInterceptor { chain ->
+                val request = chain.request()
+                    .newBuilder()
+                    .header(
+                        "User-Agent",
+                        "CountryQuest/${BuildConfig.VERSION_NAME} " +
+                                "(+https://github.com/ivanBabiichuk/countryquest-android)"
+                    )
+                    .build()
+
+                chain.proceed(request)
+            }
             .apply {
                 if (BuildConfig.DEBUG) {
                     val loggingInterceptor = HttpLoggingInterceptor().apply {
