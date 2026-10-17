@@ -8,7 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import io.github.ivanbabiichuk.countryquest.feature.home.HomeRouteContent
 import io.github.ivanbabiichuk.countryquest.feature.quiz.QuizRouteContent
-import io.github.ivanbabiichuk.countryquest.feature.results.ResultsScreen
+import io.github.ivanbabiichuk.countryquest.feature.results.ResultsRouteContent
 import io.github.ivanbabiichuk.countryquest.feature.statistics.StatisticsScreen
 
 @Composable
@@ -41,14 +41,8 @@ fun CountryQuestNavHost(
 
             QuizRouteContent(
                 mode = route.mode,
-                onFinishQuiz = { score, totalQuestions ->
-                    navController.navigate(
-                        ResultsRoute(
-                            mode = route.mode,
-                            score = score,
-                            totalQuestions = totalQuestions,
-                        )
-                    ) {
+                onFinishQuiz = { gameId ->
+                    navController.navigate(ResultsRoute(gameId = gameId)) {
                         popUpTo<QuizRoute> {
                             inclusive = true
                         }
@@ -61,15 +55,13 @@ fun CountryQuestNavHost(
             )
         }
 
-        composable<ResultsRoute> { backStackEntry ->
-            val route = backStackEntry.toRoute<ResultsRoute>()
-
-            ResultsScreen(
-                score = route.score,
-                totalQuestions = route.totalQuestions,
-                onPlayAgain = {
-                    navController.navigate(QuizRoute(route.mode)) {
-                        popUpTo<HomeRoute>()
+        composable<ResultsRoute> {
+            ResultsRouteContent(
+                onPlayAgain = { mode ->
+                    navController.navigate(QuizRoute(mode)) {
+                        popUpTo<HomeRoute> {
+                            inclusive = false
+                        }
                         launchSingleTop = true
                     }
                 },

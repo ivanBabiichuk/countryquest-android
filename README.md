@@ -4,7 +4,7 @@ Learn geography through short quizzes about flags, capitals, and countries.
 
 CountryQuest is a personal Android product built with Kotlin and Jetpack Compose. It combines a REST API, a local Room catalog, reactive UI state, and a quiz engine in a single-module application with separate presentation, domain, and data packages.
 
-> **Status: playable v1.0 prototype, under active development.** Three quiz modes, catalog synchronization, flag loading, and round results work. Persistent game history, real statistics, and guaranteed offline flag availability are still planned.
+> **Status: playable v1.0 prototype, under active development.** Three quiz modes, catalog synchronization, flag loading, and round results work. Completed rounds and answer snapshots are persisted in Room. Statistics, a history browsing screen, and guaranteed offline flag availability are still planned.
 
 The app UI is in English. Accounts, ads, analytics, and a custom backend are outside the v1.0 scope.
 
@@ -18,7 +18,7 @@ The app UI is in English. Accounts, ads, analytics, and a custom backend are out
 
 Each round contains **10 questions**, with **4 answer options** and one correct answer per question. Target countries do not repeat within a round. A correct answer earns one point; the final score ranges from 0 to 10. There is no timer or score penalty.
 
-After answering, the screen reveals the correct option and country details. Answers cannot be changed, and the next question becomes available only after an answer. Results show the score and offer **Play Again** or **Back to Home**.
+After answering, the screen reveals the correct option and country details. Answers cannot be changed, and the next question becomes available only after an answer. After a successful save, Results loads the game by its ID, shows the score, and offers **Play Again** or **Back to Home**.
 
 The generator filters countries according to the selected mode. Countries with ambiguous shared capitals are excluded from capital-based questions. If fewer than ten eligible countries remain, the app shows an insufficient-catalog state instead of generating a partial round.
 
@@ -28,7 +28,8 @@ The generator filters countries according to the selected mode. Countries with a
 | --- | --- |
 | Home | Mode selection, saved-country count, manual catalog update, and loading/error feedback. |
 | Quiz | Three modes, progress, score, answer feedback, and country details. |
-| Results | Completed-round score, replay, and return to Home. Results are not persisted. |
+| Results | Reads a saved game by ID; shows score and mode, replay, loading, retry, and not-found states. |
+| Game history storage | Atomic result/answer writes, duplicate-save protection, and ordered answer snapshots. No history browsing screen yet. |
 | Statistics | Navigation and a placeholder screen only. |
 | Country catalog | API download, validation, partial updates, Room persistence, and reactive observation. |
 | Synchronization | Startup refresh attempt, manual retry, shared refresh state, and concurrent-request protection. |
@@ -81,7 +82,7 @@ Retrofit + OkHttp → Country DTOs → validation / mapping → Room upsert
                                                            ↓
                                                    QuizViewModel → Quiz
                                                                        ↓
-                                                                    Results
+                                                       Save to Room → Results by game ID
 ```
 
 Room is the source for catalog reads. Starting a round loads a snapshot from Room; subsequent catalog updates do not change that round's questions or answers.
@@ -105,6 +106,14 @@ Coil uses the application's shared OkHttp client and an SVG decoder. `CountryFla
 
 Requests include a descriptive `CountryQuest/<version>` User-Agent with the repository URL. Debug builds log HTTP requests and response bodies, with `Authorization`, `Cookie`, and `Set-Cookie` headers redacted. The HTTP logging interceptor is omitted from release builds.
 
+### Saved game history
+
+`RoomGameHistoryRepository` stores each completed result and its answer snapshots through a single DAO transaction. A failed answer insert rolls back the whole game. Repeating the same save is a no-op; conflicting data for an existing ID is rejected. Answer positions are persisted and sorted on read. History does not depend on foreign keys to the live country catalog.
+
+Database version 2 adds `game_results` and `game_answers` through an automatic migration from version 1, preserving saved countries. Both exported schemas are versioned.
+
+The quiz exposes saving and save-error states and navigates only after a successful write. Results receives `gameId` through navigation and loads the record using a ViewModel with `SavedStateHandle`. Replay uses the mode stored in that record.
+
 ## Offline behavior and current limitations
 
 The local catalog survives app restarts. After a successful download, text-based quizzes can use saved countries without a network connection, and a failed refresh does not remove them.
@@ -114,7 +123,8 @@ Full offline support is not finished:
 - A fresh installation needs a successful catalog download; no bundled seed catalog exists yet.
 - Flags use remote URLs and Coil caching. Cached images are not a guarantee that every flag will be available offline.
 - If all flag sources fail, answers remain disabled. The user can retry or return Home; automatic question replacement is not implemented.
-- Completed rounds and answers are not stored in Room. Statistics are still a placeholder.
+- Completed rounds and answers are stored in Room, but statistics and a history browsing screen are not implemented.
+- If saving fails, retry reuses the same game ID and snapshot. Leaving the quiz discards the pending in-memory result; recovery of unsaved results after process death is not implemented.
 - Active rounds are held in a ViewModel; restoration after process death is not implemented.
 - Catalog freshness timestamps, scheduled synchronization, and app-level retry/backoff policies are not implemented.
 
@@ -191,17 +201,18 @@ Run static Android checks separately:
 | Suite | Covered scenarios |
 | --- | --- |
 | JVM | Round generation, eligibility, DTO mapping, API parsing and failures, partial catalog updates, synchronization coordination, User-Agent, and logging behavior. |
-| Android | Real Room reads/writes and rollback, Home/Quiz ViewModels, Home UI states, and flag loading with real Coil decoders. |
+| Android | Real Room reads/writes and rollback, Home/Quiz ViewModels, Home UI states, flag loading with real Coil decoders, game-history transactions and migration, save/retry behavior, and Results loading/UI states. |
 | Flag regression tests | SVG success, PNG fallback after HTTP or decoding failure, retry recovery, missing/duplicate URLs, country changes, and answer availability after recovery. |
 
 API tests use MockWebServer. Flag tests supply controlled HTTP responses through a test interceptor while retaining the production image-loader factory and real SVG/PNG decoders. They do not depend on live Wikimedia or FlagCDN availability.
 
-**Latest local verification — 16 October 2026:** 58 JVM debug tests and 41 Android tests passed on a Pixel 10 Pro emulator running Android 17 / API 37. Four targeted networking tests also passed for release using a temporary Gradle init script to enable release unit tests; that script is not part of the repository. These counts include the original template tests and describe local verification, not CI or a coverage percentage. Lint is listed as a runnable check, not as a verified result of that run.
+**Latest local verification — 17 October 2026:** 69 JVM debug tests and 68 Android tests passed on a Pixel 10 Pro emulator running Android 17 / API 37. On 16 October, four targeted networking tests also passed for release using a temporary Gradle init script to enable release unit tests; that script is not part of the repository. These counts include the original template tests and describe local verification, not CI or a coverage percentage. Lint is listed as a runnable check, not as a verified result of that run.
 
-## Remaining v1.0 milestones
+## v1.0 milestones
 
-- [ ] Persist completed rounds and answers atomically, with protection against duplicate saves.
-- [ ] Implement statistics and game history from saved results.
+- [x] Persist completed rounds and answers atomically, with protection against duplicate saves.
+- [x] Read Results from Room by game ID, with loading, error, and not-found states.
+- [ ] Implement statistics and a history browsing screen from saved results.
 - [ ] Add a bundled country catalog and reliable offline flag assets.
 - [ ] Track catalog freshness and complete synchronization behavior.
 - [ ] Provide a recovery path when no flag source is available.
