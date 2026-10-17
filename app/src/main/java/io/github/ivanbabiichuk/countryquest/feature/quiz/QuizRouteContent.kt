@@ -12,7 +12,7 @@ import io.github.ivanbabiichuk.countryquest.domain.model.QuizMode
 @Composable
 fun QuizRouteContent(
     mode: QuizMode,
-    onFinishQuiz: (score: Int, totalQuestions: Int) -> Unit,
+    onFinishQuiz: (gameId: String) -> Unit,
     onExitQuiz: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: QuizViewModel = hiltViewModel()
@@ -28,10 +28,7 @@ fun QuizRouteContent(
 
     LaunchedEffect(finished) {
         if (finished != null) {
-            currentOnFinishQuiz(
-                finished.score,
-                finished.totalQuestions,
-            )
+            currentOnFinishQuiz(finished.result.id)
         }
     }
 

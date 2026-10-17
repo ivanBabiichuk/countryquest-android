@@ -13,9 +13,7 @@ data class QuizRoute(
 
 @Serializable
 data class ResultsRoute(
-    val mode: QuizMode,
-    val score: Int,
-    val totalQuestions: Int
+    val gameId: String
 )
 
 @Serializable
