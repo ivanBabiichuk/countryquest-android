@@ -1,5 +1,6 @@
 package io.github.ivanbabiichuk.countryquest.feature.quiz
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -47,6 +48,10 @@ fun QuizScreen(
 
     LaunchedEffect(questionIndex) {
         scrollState.scrollTo(0)
+    }
+
+    BackHandler(enabled = uiState is QuizUiState.Saving) {
+        // Wait for the current save attempt to finish.
     }
 
     Column(
@@ -108,12 +113,33 @@ fun QuizScreen(
                 }
             }
 
+            is QuizUiState.Saving -> {
+                CircularProgressIndicator()
+                Text("Saving result…")
+            }
+
+            is QuizUiState.SaveError -> {
+                Text("Could not save your result.")
+
+                Text(
+                    "Your answers are still available. Try saving again. " +
+                            "Leaving this screen will discard the pending result."
+                )
+
+                Button(onClick = onRetry) {
+                    Text("Try again")
+                }
+            }
+
             is QuizUiState.Finished -> {
                 Text("Round complete!")
             }
         }
 
-        if (uiState !is QuizUiState.Finished) {
+        if (
+            uiState !is QuizUiState.Finished &&
+            uiState !is QuizUiState.Saving
+        ) {
             OutlinedButton(onClick = onExitQuiz) {
                 Text("Back to Home")
             }

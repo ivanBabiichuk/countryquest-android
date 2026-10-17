@@ -1,7 +1,7 @@
 package io.github.ivanbabiichuk.countryquest.feature.quiz
 
+import io.github.ivanbabiichuk.countryquest.domain.model.GameResult
 import io.github.ivanbabiichuk.countryquest.domain.model.QuizAnswer
-import io.github.ivanbabiichuk.countryquest.domain.model.QuizMode
 import io.github.ivanbabiichuk.countryquest.domain.model.QuizQuestion
 
 sealed interface QuizUiState {
@@ -42,15 +42,16 @@ sealed interface QuizUiState {
             get() = questionIndex == questions.lastIndex
     }
 
-    data class Finished(
-        val mode: QuizMode,
-        val answers: List<QuizAnswer>
-    ): QuizUiState {
+    data class Saving(val result: GameResult) : QuizUiState
+
+    data class SaveError(val result: GameResult) : QuizUiState
+
+    data class Finished(val result: GameResult) : QuizUiState {
 
         val score: Int
-            get() = answers.count { it.isCorrect }
+            get() = result.score
 
         val totalQuestions: Int
-            get() = answers.size
+            get() = result.totalQuestions
     }
 }

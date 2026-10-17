@@ -38,7 +38,13 @@ fun QuizRouteContent(
     QuizScreen(
         mode = mode,
         uiState = uiState,
-        onRetry = { viewModel.startRound(mode) },
+        onRetry = {
+            if (uiState is QuizUiState.SaveError) {
+                viewModel.retrySave()
+            } else {
+                viewModel.startRound(mode)
+            }
+        },
         onSelectAnswer = viewModel::selectAnswer,
         onNextQuestion = viewModel::nextQuestion,
         onExitQuiz = onExitQuiz,
