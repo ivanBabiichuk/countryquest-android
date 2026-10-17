@@ -1,5 +1,7 @@
 package io.github.ivanbabiichuk.countryquest.feature.quiz
 
+import io.github.ivanbabiichuk.countryquest.domain.model.GameResult
+import io.github.ivanbabiichuk.countryquest.domain.repository.GameHistoryRepository
 import androidx.lifecycle.ViewModelStore
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.github.ivanbabiichuk.countryquest.domain.model.Country
@@ -84,10 +86,10 @@ class QuizViewModelTest {
             viewModel.nextQuestion(question.country.code)
         }
 
-        val finished = viewModel.uiState.value as QuizUiState.Finished
+        val finished = viewModel.uiState.first { it is QuizUiState.Finished } as QuizUiState.Finished
         assertEquals(10, finished.totalQuestions)
         assertEquals(7, finished.score)
-        assertEquals(QuizMode.CAPITAL, finished.mode)
+        assertEquals(QuizMode.CAPITAL, finished.result.mode)
     }
 
     @Test
@@ -207,7 +209,7 @@ class QuizViewModelTest {
             viewModel.selectAnswer(lastCode, question.correctOptionId)
             viewModel.nextQuestion(lastCode)
         }
-        val finished = viewModel.uiState.value as QuizUiState.Finished
+        val finished = viewModel.uiState.first { it is QuizUiState.Finished } as QuizUiState.Finished
         assertEquals(10, finished.score)
         viewModel.startRound(QuizMode.FLAG)
         viewModel.nextQuestion(lastCode)
@@ -241,6 +243,141 @@ class QuizViewModelTest {
         assertEquals(0, repository.refreshCalls)
     }
 
+    @Test
+    fun savesOnlyAfterFinalConfirmationAndWaitsForStorage() = quizTest {
+        val pending = CompletableDeferred<Unit>()
+        val history = FakeGameHistoryRepository().apply { save = { pending.await() } }
+        val viewModel = createViewModel(FakeCountryRepository(), history)
+        viewModel.startRound(QuizMode.CAPITAL)
+        awaitActive(viewModel)
+        val last = answerRound(viewModel)
+        assertTrue(history.attempts.isEmpty())
+        val before = System.currentTimeMillis()
+        viewModel.nextQuestion(last)
+        val saving = viewModel.uiState.value as QuizUiState.Saving
+        val saved = history.attempts.single()
+        assertEquals(saving.result, saved)
+        assertEquals(10, saved.totalQuestions)
+        assertEquals(7, saved.score)
+        assertEquals(QuizMode.CAPITAL, saved.mode)
+        assertTrue(saved.id.isNotBlank())
+        assertTrue(saved.completedAtEpochMillis in before..System.currentTimeMillis())
+        pending.complete(Unit)
+        val finished = viewModel.uiState.first { it is QuizUiState.Finished } as QuizUiState.Finished
+        assertEquals(saved, finished.result)
+    }
+
+    @Test
+    fun savingIgnoresDoubleFinishRetryRestartAndAnswerEvents() = quizTest {
+        val pending = CompletableDeferred<Unit>()
+        val history = FakeGameHistoryRepository().apply { save = { pending.await() } }
+        val countries = FakeCountryRepository()
+        val viewModel = createViewModel(countries, history)
+        viewModel.startRound(QuizMode.CAPITAL)
+        awaitActive(viewModel)
+        val last = answerRound(viewModel)
+        viewModel.nextQuestion(last)
+        val saving = viewModel.uiState.value
+        repeat(3) {
+            viewModel.nextQuestion(last)
+            viewModel.retrySave()
+            viewModel.startRound(QuizMode.FLAG)
+            viewModel.selectAnswer(last, last)
+        }
+        assertEquals(saving, viewModel.uiState.value)
+        assertEquals(1, history.attempts.size)
+        assertEquals(1, countries.readCalls)
+        pending.complete(Unit)
+        viewModel.uiState.first { it is QuizUiState.Finished }
+        viewModel.retrySave()
+        assertEquals(1, history.attempts.size)
+    }
+
+    @Test
+    fun repeatedSaveFailuresAndRecoveryReuseExactSnapshot() = quizTest {
+        val history = FakeGameHistoryRepository().apply { save = { throw IOException("Disk unavailable") } }
+        val countries = FakeCountryRepository()
+        val viewModel = createViewModel(countries, history)
+        viewModel.startRound(QuizMode.COUNTRY)
+        awaitActive(viewModel)
+        val last = answerRound(viewModel)
+        viewModel.nextQuestion(last)
+        val error = viewModel.uiState.first { it is QuizUiState.SaveError } as QuizUiState.SaveError
+        countries.countries = emptyList()
+        viewModel.startRound(QuizMode.FLAG)
+        viewModel.nextQuestion(last)
+        viewModel.selectAnswer(last, last)
+        assertEquals(error, viewModel.uiState.value)
+        assertEquals(1, history.attempts.size)
+        viewModel.retrySave()
+        viewModel.uiState.first { it is QuizUiState.SaveError }
+        assertEquals(2, history.attempts.size)
+        val pending = CompletableDeferred<Unit>()
+        history.save = { pending.await() }
+        viewModel.retrySave()
+        viewModel.retrySave()
+        assertTrue(viewModel.uiState.value is QuizUiState.Saving)
+        assertEquals(3, history.attempts.size)
+        assertTrue(history.attempts.all { it == error.result })
+        pending.complete(Unit)
+        val finished = viewModel.uiState.first { it is QuizUiState.Finished } as QuizUiState.Finished
+        assertEquals(error.result, finished.result)
+        assertEquals(1, countries.readCalls)
+    }
+
+    @Test
+    fun retryOutsideSaveErrorDoesNotWriteAnything() = quizTest {
+        val history = FakeGameHistoryRepository()
+        val viewModel = createViewModel(FakeCountryRepository(), history)
+        viewModel.retrySave()
+        assertEquals(QuizUiState.Idle, viewModel.uiState.value)
+        viewModel.startRound(QuizMode.FLAG)
+        awaitActive(viewModel)
+        viewModel.retrySave()
+        assertTrue(viewModel.uiState.value is QuizUiState.Active)
+        assertTrue(history.attempts.isEmpty())
+    }
+
+    @Test
+    fun clearingViewModelCancelsSaveWithoutReportingStorageErrorOrSuccess() = quizTest {
+        val cancelled = CompletableDeferred<Unit>()
+        val history = FakeGameHistoryRepository().apply {
+            save = { try { awaitCancellation() } finally { cancelled.complete(Unit) } }
+        }
+        val viewModel = createViewModel(FakeCountryRepository(), history)
+        viewModel.startRound(QuizMode.FLAG)
+        awaitActive(viewModel)
+        viewModel.nextQuestion(answerRound(viewModel))
+        val saving = viewModel.uiState.value as QuizUiState.Saving
+        store.clear()
+        cancelled.await()
+        assertEquals(saving, viewModel.uiState.value)
+    }
+
+    private fun answerRound(viewModel: QuizViewModel): String {
+        var lastCode = ""
+        repeat(10) { index ->
+            val question = activeState(viewModel).currentQuestion
+            lastCode = question.country.code
+            val option = if (index < 7) question.correctOptionId
+                else question.options.first { it.id != question.correctOptionId }.id
+            viewModel.selectAnswer(lastCode, option)
+            if (index < 9) viewModel.nextQuestion(lastCode)
+        }
+        return lastCode
+    }
+
+    private class FakeGameHistoryRepository : GameHistoryRepository {
+        val attempts = mutableListOf<GameResult>()
+        var save: suspend (GameResult) -> Unit = {}
+        override suspend fun saveCompletedGame(result: GameResult) {
+            attempts.add(result)
+            save(result)
+        }
+        override fun observeResults(): Flow<List<GameResult>> = error("Quiz must not observe history")
+        override suspend fun getResult(gameId: String): GameResult? = error("Quiz must not read history")
+    }
+
     private fun quizTest(block: suspend () -> Unit) = runBlocking {
         withTimeout(5_000.milliseconds) {
             withContext(Dispatchers.Main.immediate) {
@@ -253,8 +390,11 @@ class QuizViewModelTest {
         }
     }
 
-    private fun createViewModel(repository: FakeCountryRepository) =
-        QuizViewModel(QuizRoundGenerator(Random(42)), repository).also {
+    private fun createViewModel(
+        repository: FakeCountryRepository,
+        history: FakeGameHistoryRepository = FakeGameHistoryRepository()
+    ) =
+        QuizViewModel(QuizRoundGenerator(Random(42)), repository, history).also {
             store.put("quiz-${nextKey++}", it)
         }
 
