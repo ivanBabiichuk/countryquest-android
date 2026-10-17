@@ -6,7 +6,7 @@ data class GameAnswer(
     val selectedOptionId: String,
     val selectedOptionText: String,
     val correctOptionId: String,
-    val correctOptionText: String,
+    val correctOptionText: String
 ) {
     init {
         require(countryCode.isNotBlank())

@@ -9,6 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.github.ivanbabiichuk.countryquest.data.local.CountryQuestDatabase
 import io.github.ivanbabiichuk.countryquest.data.local.dao.CountryDao
+import io.github.ivanbabiichuk.countryquest.data.local.dao.GameHistoryDao
 import javax.inject.Singleton
 
 @Module
@@ -26,5 +27,8 @@ object DatabaseModule {
 
     @Provides
     fun provideDao(database: CountryQuestDatabase): CountryDao = database.countryDao()
+
+    @Provides
+    fun provideGameHistoryDao(database: CountryQuestDatabase): GameHistoryDao = database.gameHistoryDao()
 
 }

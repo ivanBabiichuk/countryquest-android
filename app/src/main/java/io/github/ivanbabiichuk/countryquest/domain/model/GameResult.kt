@@ -4,7 +4,7 @@ data class GameResult(
     val id: String,
     val mode: QuizMode,
     val completedAtEpochMillis: Long,
-    val answers: List<GameAnswer>,
+    val answers: List<GameAnswer>
 ) {
     init {
         require(id.isNotBlank())
