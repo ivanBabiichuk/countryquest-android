@@ -9,7 +9,7 @@ import androidx.navigation.toRoute
 import io.github.ivanbabiichuk.countryquest.feature.home.HomeRouteContent
 import io.github.ivanbabiichuk.countryquest.feature.quiz.QuizRouteContent
 import io.github.ivanbabiichuk.countryquest.feature.results.ResultsRouteContent
-import io.github.ivanbabiichuk.countryquest.feature.statistics.StatisticsScreen
+import io.github.ivanbabiichuk.countryquest.feature.statistics.StatisticsRouteContent
 
 @Composable
 fun CountryQuestNavHost(
@@ -72,8 +72,10 @@ fun CountryQuestNavHost(
         }
 
         composable<StatisticsRoute> {
-            StatisticsScreen(
-                onGoBack = { navController.popBackStack() }
+            StatisticsRouteContent(
+                onGoBack = {
+                    navController.popBackStack()
+                }
             )
         }
     }
