@@ -57,11 +57,13 @@ class StatisticsViewModelTest {
             repository.values.value = listOf(game())
             val first = vm.uiState.first { it is StatisticsUiState.Content } as StatisticsUiState.Content
             assertEquals(1, first.statistics.overall.gamesPlayed)
+            assertEquals(listOf("game"), first.history.map { it.gameId })
             repository.values.value = listOf(game(), game("second", QuizMode.CAPITAL))
             val second = vm.uiState.first {
                 it is StatisticsUiState.Content && it.statistics.overall.gamesPlayed == 2
             } as StatisticsUiState.Content
             assertEquals(2L, second.statistics.overall.correctAnswers)
+            assertEquals(listOf("game", "second"), second.history.map { it.gameId })
             assertEquals(1, second.statistics.byMode.getValue(QuizMode.FLAG).gamesPlayed)
             assertEquals(1, second.statistics.byMode.getValue(QuizMode.CAPITAL).gamesPlayed)
             assertEquals(0, second.statistics.byMode.getValue(QuizMode.COUNTRY).gamesPlayed)
@@ -69,6 +71,23 @@ class StatisticsViewModelTest {
             vm.uiState.first { it == StatisticsUiState.Empty }
             assertEquals(1, repository.subscriptions.get())
         } finally { collector.cancelAndJoin() }
+    }
+
+    @Test fun historyPreservesRepositoryOrderAndProjectsSavedFields() = check {
+        val older = game("older", QuizMode.CAPITAL).copy(completedAtEpochMillis = 100)
+        val newer = game("newer", QuizMode.COUNTRY).copy(
+            completedAtEpochMillis = 200,
+            answers = listOf(GameAnswer("UA", "Ukraine", "FR", "France", "UA", "Ukraine"))
+        )
+        val repository = Repository().apply { values.value = listOf(newer, older) }
+        val vm = create(repository)
+        val content = vm.uiState.first { it is StatisticsUiState.Content } as StatisticsUiState.Content
+        assertEquals(listOf(
+            GameHistoryItem("newer", QuizMode.COUNTRY, 200, 0, 1),
+            GameHistoryItem("older", QuizMode.CAPITAL, 100, 1, 1)
+        ), content.history)
+        assertEquals(2, content.statistics.overall.gamesPlayed)
+        assertEquals(1L, content.statistics.overall.correctAnswers)
     }
 
     @Test fun failureIsNotEmptyAndRetryCreatesNewSubscription() = check {
