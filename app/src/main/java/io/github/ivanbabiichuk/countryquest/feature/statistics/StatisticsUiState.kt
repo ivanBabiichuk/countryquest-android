@@ -11,6 +11,7 @@ sealed interface StatisticsUiState {
     data object LoadError : StatisticsUiState
 
     data class Content(
-        val statistics: QuizStatistics
+        val statistics: QuizStatistics,
+        val history: List<GameHistoryItem>
     ) : StatisticsUiState
 }

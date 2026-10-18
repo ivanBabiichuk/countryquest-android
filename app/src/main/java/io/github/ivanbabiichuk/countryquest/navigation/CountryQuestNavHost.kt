@@ -75,6 +75,11 @@ fun CountryQuestNavHost(
             StatisticsRouteContent(
                 onGoBack = {
                     navController.popBackStack()
+                },
+                onOpenResult = { gameId ->
+                    navController.navigate(ResultsRoute(gameId = gameId)) {
+                        launchSingleTop = true
+                    }
                 }
             )
         }

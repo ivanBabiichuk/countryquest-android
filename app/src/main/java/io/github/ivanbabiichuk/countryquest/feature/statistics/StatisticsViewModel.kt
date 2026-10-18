@@ -42,7 +42,18 @@ class StatisticsViewModel @Inject constructor(
                         if (results.isEmpty()) {
                             StatisticsUiState.Empty
                         } else {
-                            StatisticsUiState.Content(statisticsCalculator.calculate(results))
+                            StatisticsUiState.Content(
+                                statistics = statisticsCalculator.calculate(results),
+                                history = results.map { result ->
+                                    GameHistoryItem(
+                                        gameId = result.id,
+                                        mode = result.mode,
+                                        completedAtEpochMillis = result.completedAtEpochMillis,
+                                        score = result.score,
+                                        totalQuestions = result.totalQuestions
+                                    )
+                                }
+                            )
                         }
 
                     state

@@ -23,13 +23,16 @@ import io.github.ivanbabiichuk.countryquest.domain.model.QuizMode
 import io.github.ivanbabiichuk.countryquest.domain.model.QuizStatistics
 import io.github.ivanbabiichuk.countryquest.domain.model.StatisticsSummary
 import io.github.ivanbabiichuk.countryquest.ui.theme.CountryQuestTheme
+import java.text.DateFormat
 import java.text.NumberFormat
+import java.util.Date
 
 @Composable
 fun StatisticsScreen(
     uiState: StatisticsUiState,
     onRetry: () -> Unit,
     onGoBack: () -> Unit,
+    onOpenResult: (gameId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -99,6 +102,23 @@ fun StatisticsScreen(
                         summary = uiState.statistics.byMode.getValue(mode)
                     )
                 }
+
+                item(key = "history_header") {
+                    Text(
+                        text = "Game history",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
+
+                items(
+                    items = uiState.history,
+                    key = { "game_${it.gameId}" }
+                ) { game ->
+                    GameHistoryCard(
+                        game = game,
+                        onClick = { onOpenResult(game.gameId) }
+                    )
+                }
             }
         }
 
@@ -152,12 +172,58 @@ private fun StatisticsSummaryCard(
     }
 }
 
+@Composable
+private fun GameHistoryCard(
+    game: GameHistoryItem,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val completedAt = DateFormat.getDateTimeInstance(
+        DateFormat.MEDIUM,
+        DateFormat.SHORT
+    ).format(Date(game.completedAtEpochMillis))
+
+    Card(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = when (game.mode) {
+                    QuizMode.FLAG -> "Guess the Flag"
+                    QuizMode.CAPITAL -> "Guess the Capital"
+                    QuizMode.COUNTRY -> "Guess the Country"
+                },
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Text(
+                text = "${game.score} / ${game.totalQuestions}",
+                style = MaterialTheme.typography.headlineSmall
+            )
+
+            Text(
+                text = completedAt,
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Text(
+                text = "View result",
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun StatisticsContentPreview() {
     StatisticsPreview(
-        StatisticsUiState.Content(
-            QuizStatistics(
+        uiState = StatisticsUiState.Content(
+            statistics = QuizStatistics(
                 overall = StatisticsSummary(
                     gamesPlayed = 3,
                     correctAnswers = 24,
@@ -168,6 +234,29 @@ private fun StatisticsContentPreview() {
                     QuizMode.FLAG to StatisticsSummary(2, 17, 20, 10),
                     QuizMode.CAPITAL to StatisticsSummary(1, 7, 10, 7),
                     QuizMode.COUNTRY to StatisticsSummary(0, 0, 0, null)
+                )
+            ),
+            history = listOf(
+                GameHistoryItem(
+                    gameId = "preview-capital",
+                    mode = QuizMode.CAPITAL,
+                    completedAtEpochMillis = 1_760_000_000_000L,
+                    score = 7,
+                    totalQuestions = 10
+                ),
+                GameHistoryItem(
+                    gameId = "preview-flag-perfect",
+                    mode = QuizMode.FLAG,
+                    completedAtEpochMillis = 1_759_999_000_000L,
+                    score = 10,
+                    totalQuestions = 10
+                ),
+                GameHistoryItem(
+                    gameId = "preview-flag",
+                    mode = QuizMode.FLAG,
+                    completedAtEpochMillis = 1_759_998_000_000L,
+                    score = 7,
+                    totalQuestions = 10
                 )
             )
         )
@@ -200,6 +289,7 @@ private fun StatisticsPreview(uiState: StatisticsUiState) {
                 uiState = uiState,
                 onRetry = {},
                 onGoBack = {},
+                onOpenResult = {}
             )
         }
     }

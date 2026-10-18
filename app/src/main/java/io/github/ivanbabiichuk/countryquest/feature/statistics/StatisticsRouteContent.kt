@@ -9,6 +9,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun StatisticsRouteContent(
     onGoBack: () -> Unit,
+    onOpenResult: (gameId: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: StatisticsViewModel = hiltViewModel()
 ) {
@@ -18,6 +19,7 @@ fun StatisticsRouteContent(
         uiState = uiState,
         onRetry = viewModel::retry,
         onGoBack = onGoBack,
+        onOpenResult = onOpenResult,
         modifier = modifier
     )
 }
