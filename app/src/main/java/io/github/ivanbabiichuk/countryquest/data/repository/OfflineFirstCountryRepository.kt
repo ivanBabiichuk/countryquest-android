@@ -1,16 +1,19 @@
 package io.github.ivanbabiichuk.countryquest.data.repository
 
 import android.database.sqlite.SQLiteException
-import io.github.ivanbabiichuk.countryquest.data.local.dao.CountryDao
+import io.github.ivanbabiichuk.countryquest.core.time.TimeProvider
+import io.github.ivanbabiichuk.countryquest.data.local.CountryCatalogLocalDataSource
 import io.github.ivanbabiichuk.countryquest.data.mapper.toDomain
 import io.github.ivanbabiichuk.countryquest.data.mapper.toDomainOrNull
 import io.github.ivanbabiichuk.countryquest.data.mapper.toEntity
 import io.github.ivanbabiichuk.countryquest.data.remote.CountriesApi
 import io.github.ivanbabiichuk.countryquest.domain.model.Country
+import io.github.ivanbabiichuk.countryquest.domain.model.CountryCatalogStatus
 import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRefreshFailure
 import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRefreshResult
 import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -21,18 +24,36 @@ import javax.inject.Inject
 
 class OfflineFirstCountryRepository @Inject constructor(
     private val countriesApi: CountriesApi,
-    private val countryDao: CountryDao
-): CountryRepository {
+    private val localDataSource: CountryCatalogLocalDataSource,
+    private val timeProvider: TimeProvider
+) : CountryRepository {
 
     private val refreshMutex = Mutex()
 
     override fun observeCountries(): Flow<List<Country>> =
-        countryDao.observeCountries().map { entities ->
+        localDataSource.observeCountries().map { entities ->
             entities.map { it.toDomain() }
         }
 
     override suspend fun getCountries(): List<Country> =
-        countryDao.getCountries().map { it.toDomain() }
+        localDataSource.getCountries().map { it.toDomain() }
+
+    override suspend fun getCatalogStatus(): Result<CountryCatalogStatus> =
+        try {
+            Result.success(localDataSource.getCatalogStatus())
+        } catch (ex: SQLiteException) {
+            Result.failure(ex)
+        }
+
+    override fun observeCatalogStatus(): Flow<CountryCatalogStatus> =
+        localDataSource.observeCatalogStatus()
+            .map { row ->
+                CountryCatalogStatus(
+                    countriesCount = row.countriesCount,
+                    lastSuccessfulSyncAtEpochMillis = row.lastSuccessfulSyncAtEpochMillis
+                )
+            }
+            .distinctUntilChanged()
 
     override suspend fun refreshCountries(): CountryRefreshResult =
         refreshMutex.withLock {
@@ -64,7 +85,10 @@ class OfflineFirstCountryRepository @Inject constructor(
             val entities = countries.map { it.toEntity() }
 
             try {
-                countryDao.upsertCountries(entities)
+                localDataSource.saveSyncedCountries(
+                    countries = entities,
+                    syncedAtEpochMillis = timeProvider.currentTimeMillis()
+                )
             } catch (ex: SQLiteException) {
                 return@withLock failure(CountryRefreshFailure.STORAGE)
             }

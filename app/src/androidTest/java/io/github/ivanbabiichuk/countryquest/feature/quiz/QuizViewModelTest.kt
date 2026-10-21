@@ -5,6 +5,7 @@ import io.github.ivanbabiichuk.countryquest.domain.repository.GameHistoryReposit
 import androidx.lifecycle.ViewModelStore
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.github.ivanbabiichuk.countryquest.domain.model.Country
+import io.github.ivanbabiichuk.countryquest.domain.model.CountryCatalogStatus
 import io.github.ivanbabiichuk.countryquest.domain.model.CountryFlag
 import io.github.ivanbabiichuk.countryquest.domain.model.QuizMode
 import io.github.ivanbabiichuk.countryquest.domain.quiz.QuizRoundGenerator
@@ -418,6 +419,12 @@ class QuizViewModelTest {
         var refreshCalls = 0
         var observationCalls = 0
         var read: suspend () -> List<Country> = { countries }
+
+        override fun observeCatalogStatus(): Flow<CountryCatalogStatus> =
+            error("A quiz must not observe catalog sync status")
+
+        override suspend fun getCatalogStatus(): Result<CountryCatalogStatus> =
+            error("Starting a quiz must not read catalog sync status")
 
         override suspend fun getCountries(): List<Country> {
             readCalls++

@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.github.ivanbabiichuk.countryquest.data.local.CountryQuestDatabase
+import io.github.ivanbabiichuk.countryquest.data.local.dao.CatalogSyncMetadataDao
 import io.github.ivanbabiichuk.countryquest.data.local.dao.CountryDao
 import io.github.ivanbabiichuk.countryquest.data.local.dao.GameHistoryDao
 import javax.inject.Singleton
@@ -30,5 +31,8 @@ object DatabaseModule {
 
     @Provides
     fun provideGameHistoryDao(database: CountryQuestDatabase): GameHistoryDao = database.gameHistoryDao()
+
+    @Provides
+    fun provideCatalogSyncMetadataDao(database: CountryQuestDatabase): CatalogSyncMetadataDao = database.catalogSyncMetadataDao()
 
 }

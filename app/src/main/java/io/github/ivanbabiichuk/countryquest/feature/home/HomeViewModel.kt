@@ -32,10 +32,11 @@ class HomeViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val catalogState = catalogRetryTrigger
         .flatMapLatest {
-            countryRepository.observeCountries()
-                .map { countries ->
+            countryRepository.observeCatalogStatus()
+                .map { status ->
                     HomeUiState(
-                        countriesCount = countries.size,
+                        countriesCount = status.countriesCount,
+                        lastSuccessfulSyncAtEpochMillis = status.lastSuccessfulSyncAtEpochMillis,
                         isReadingCatalog = false
                     )
                 }
