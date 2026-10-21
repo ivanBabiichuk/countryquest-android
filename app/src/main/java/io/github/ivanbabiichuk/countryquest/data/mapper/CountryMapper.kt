@@ -25,7 +25,7 @@ fun CountryDto.toDomainOrNull(): Country? {
             svgUrl = flags?.svg.toHttpsUrlOrNull(),
             pngUrl = flags?.png.toHttpsUrlOrNull()
         )
-    )
+    ).withKnownDataCorrections()
 }
 
 private fun String?.toHttpsUrlOrNull(): String? =

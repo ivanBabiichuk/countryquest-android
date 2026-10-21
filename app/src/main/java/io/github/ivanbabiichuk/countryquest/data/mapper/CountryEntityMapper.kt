@@ -26,4 +26,4 @@ fun CountryEntity.toDomain(): Country =
             svgUrl = flagSvgUrl,
             pngUrl = flagPngUrl
         )
-    )
+    ).withKnownDataCorrections()
