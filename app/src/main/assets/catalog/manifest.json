@@ -1,0 +1,1789 @@
+{
+  "schemaVersion": 1,
+  "seedVersion": 1,
+  "preparedAt": "2026-10-21",
+  "status": "draft-for-integration",
+  "catalogAsset": "catalog/countries.json",
+  "catalogSha256": "98c4f4e09ddb2249c82aed4cb1a7cf1eae0c96c268d0b1d862a5ca5b027f6d6f",
+  "countryCount": 250,
+  "flagCount": 250,
+  "sourceSnapshot": {
+    "url": "https://countries.dev/countries",
+    "sha256": "a9119f8e60b247cadcd7cee7fbd2de9d68ae1889c1ddd4c734f3830840d7363b",
+    "retrievedOn": "2026-10-21"
+  },
+  "flagArchive": {
+    "url": "https://flagcdn.com/svg.zip",
+    "sha256": "583b0f866eb43634733a60e3e4f8685f34d76c63f250e18dbbb6932e18bb47d7"
+  },
+  "sources": [
+    {
+      "name": "countries.dev",
+      "url": "https://countries.dev/",
+      "licenseAsStatedByProvider": "Underlying GeoNames data: CC BY 4.0"
+    },
+    {
+      "name": "Flagpedia / FlagCDN",
+      "url": "https://flagpedia.net/download/vector",
+      "licenseAsStatedByProvider": "Public domain"
+    },
+    {
+      "name": "AF SVG / Wikimedia Commons",
+      "url": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Taliban.svg",
+      "licenseAsStatedByProvider": "Public domain",
+      "vectorAuthor": "Lexicon"
+    }
+  ],
+  "flags": [
+    {
+      "code": "AD",
+      "asset": "flags/ad.svg",
+      "sha256": "e2cf35be958f3b581660085c0d9b768610f476c486a3d23798f62187fffa270f",
+      "bytes": 54926,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "AE",
+      "asset": "flags/ae.svg",
+      "sha256": "8db8bfc3d1a711967e44fbe237a52d75cd03a3dfbcefc9d78febd61c2973915e",
+      "bytes": 228,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "AF",
+      "asset": "flags/af.svg",
+      "sha256": "fc326ebb964d9a50e31984495d1cf94f810a8af2ecaac5615001358404a389be",
+      "bytes": 37065,
+      "source": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Flag_of_the_Taliban.svg"
+    },
+    {
+      "code": "AG",
+      "asset": "flags/ag.svg",
+      "sha256": "73f382e91c9e9ba8e786696f20011a04c7e22354e37db61921f2c57645ec7385",
+      "bytes": 483,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "AI",
+      "asset": "flags/ai.svg",
+      "sha256": "45c2a6f26a00453c2efaeb31d053b163823f22e48371b2b137a64b41d2040020",
+      "bytes": 2955,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "AL",
+      "asset": "flags/al.svg",
+      "sha256": "173ec6b28100ddbaeb011b73b4776e50fc2545e14c81ad65e25c19b7137788be",
+      "bytes": 9425,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "AM",
+      "asset": "flags/am.svg",
+      "sha256": "1eb2190d967efac59bb4f18f699b465f76dc3128593011e59243450cd593f846",
+      "bytes": 201,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "AO",
+      "asset": "flags/ao.svg",
+      "sha256": "0f10545c2991c7ad5332dff881c0e176de0a021260e722af7cfdd996ce9b497e",
+      "bytes": 2225,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "AQ",
+      "asset": "flags/aq.svg",
+      "sha256": "18adc3028d1237e66ca9f12d6b051e790b856d124c29531efde89c0271064dfe",
+      "bytes": 4519,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "AR",
+      "asset": "flags/ar.svg",
+      "sha256": "0828d651a95f39cea1e5d9d2ee30ec4dbcf55d70bdea39c89ec80c83226ad86d",
+      "bytes": 4003,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "AS",
+      "asset": "flags/as.svg",
+      "sha256": "082377dff1b4b890610f7d127594af7caa2ddee166050187a9fd4337726bc4a0",
+      "bytes": 47868,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "AT",
+      "asset": "flags/at.svg",
+      "sha256": "5c5bded6c58d94069f75d61049773930b8a23aa2a73a17355f622c6ce40090dc",
+      "bytes": 154,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "AU",
+      "asset": "flags/au.svg",
+      "sha256": "b826e039804d5cf313bd7e22a40ea2239e8e22ddba7c19a8787dfaad1dda71aa",
+      "bytes": 1307,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "AW",
+      "asset": "flags/aw.svg",
+      "sha256": "2c9121a16748576e5bf0a2c24e5405ba42c9cae197ff213fadbdceb4cc706def",
+      "bytes": 341,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "AX",
+      "asset": "flags/ax.svg",
+      "sha256": "df64c5be1cc6592dc1aa6bd6891a8950f021311a86503ecc56143968c3ed4932",
+      "bytes": 256,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "AZ",
+      "asset": "flags/az.svg",
+      "sha256": "963c074ace679c88a77f6a5db3bd0f3b98a169dae5ebd12abb6293ecda497280",
+      "bytes": 519,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "BA",
+      "asset": "flags/ba.svg",
+      "sha256": "1c83a2cf7e8366afb9d724f896902ec46a722739538349d6f41b0953d47f171f",
+      "bytes": 437,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "BB",
+      "asset": "flags/bb.svg",
+      "sha256": "b38fe14e1e967ea658331d386e8028c5a02d2de70c8376b06deda6ea77a4938b",
+      "bytes": 606,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "BD",
+      "asset": "flags/bd.svg",
+      "sha256": "b509e5c29b8c32761c273449647d5a35c5301227b27ee786d353be7916bfddaf",
+      "bytes": 150,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "BE",
+      "asset": "flags/be.svg",
+      "sha256": "95933c385c9e72479ec7e63f6cbca50d07695fd2e41fab334ea549c20b234fd1",
+      "bytes": 182,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "BF",
+      "asset": "flags/bf.svg",
+      "sha256": "4c88dba85dcf8f799607e2ce32f5af58741ccd31f15fb917bf89f58a140f91a4",
+      "bytes": 568,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "BG",
+      "asset": "flags/bg.svg",
+      "sha256": "829c1f5f6f403632fd4710b8b7f3a313408e5285e4540af97950408ff9a5abfe",
+      "bytes": 201,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "BH",
+      "asset": "flags/bh.svg",
+      "sha256": "4cb584ef406f6bc57ea9c935db43890b9719ae126fe1ad4fb10890709978162b",
+      "bytes": 218,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "BI",
+      "asset": "flags/bi.svg",
+      "sha256": "00f86f0400888d0ecf5a2b9bfa66f176af6095f413d53d622b6c061c1723cfd9",
+      "bytes": 633,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "BJ",
+      "asset": "flags/bj.svg",
+      "sha256": "03e7fd78282d719338630eaf2301fa9c9dbcbf57a9639a20e8fbb43353409569",
+      "bytes": 197,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "BL",
+      "asset": "flags/bl.svg",
+      "sha256": "863f20b771a407641f97ecf1fb9975745b5a28720238fc5e5cc805e90f779186",
+      "bytes": 37273,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "BM",
+      "asset": "flags/bm.svg",
+      "sha256": "c5641664796bd1a0906af9f10543eca02aca8fa97104b2f92fd07e9670adf91c",
+      "bytes": 32143,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "BN",
+      "asset": "flags/bn.svg",
+      "sha256": "cdb37ed23eed4e4a010d3e68db6d66048a7e90b4d465c735f6e6072564b0fa91",
+      "bytes": 20922,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "BO",
+      "asset": "flags/bo.svg",
+      "sha256": "7d724dac914eaed951a3e3dd901350b9636cfbba0fc4d78f1fcf193c1f29e67b",
+      "bytes": 240385,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "BQ",
+      "asset": "flags/bq.svg",
+      "sha256": "c05d6c9f222b2a0a08579d9d8e126a286bb85a3e895577e1119a9283545f8389",
+      "bytes": 462,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "BR",
+      "asset": "flags/br.svg",
+      "sha256": "e0215eff9f53b0236db885963ac45d6baea52e10ce33ceafdbe0eb1820d21160",
+      "bytes": 4160,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "BS",
+      "asset": "flags/bs.svg",
+      "sha256": "44946f0ba5ad43cabe8bfa6c52e0f7a9562f7ff336d58478577f3b3a19c1ef08",
+      "bytes": 195,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "BT",
+      "asset": "flags/bt.svg",
+      "sha256": "39a47be433cda95dab7521aed8609c61f3fe377524e5de397dbb9c75624dd822",
+      "bytes": 36820,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "BV",
+      "asset": "flags/bv.svg",
+      "sha256": "0d4b9a52f0a6bd264258baac791b39910a895bb6ca06f63477fa823a262febdc",
+      "bytes": 223,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "BW",
+      "asset": "flags/bw.svg",
+      "sha256": "e89b9cb27040b2995d2f66fca2492eb19434c0793d80ff70ce6819f2540e40a0",
+      "bytes": 193,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "BY",
+      "asset": "flags/by.svg",
+      "sha256": "2af1ac1ecbfda4690e8b1b076def28e384aa69cbf5004ee37cef43665fd6e4f6",
+      "bytes": 1959,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "BZ",
+      "asset": "flags/bz.svg",
+      "sha256": "99ff3a88d1493f5e00c8a4dd9f7eb379a004961f4503eb3e5598e388c911b583",
+      "bytes": 80883,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "CA",
+      "asset": "flags/ca.svg",
+      "sha256": "3cd6c2b9fe12bc0617ef4374b570ad87920bae757a95b104384fc301352c6942",
+      "bytes": 658,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "CC",
+      "asset": "flags/cc.svg",
+      "sha256": "aa90a1a32d390ab49a3a5f4dd9636efdec42a06204b16697c7275915215f4ea9",
+      "bytes": 4700,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "CD",
+      "asset": "flags/cd.svg",
+      "sha256": "e2e70cf2f16e4ede17ec2a6d0b740c82b622e2cae6b3419d2217092f9c0872f4",
+      "bytes": 307,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "CF",
+      "asset": "flags/cf.svg",
+      "sha256": "f36cc981bf26cff6c9111be3edf29aa565164e713f9704e22d98116ac80816aa",
+      "bytes": 331,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "CG",
+      "asset": "flags/cg.svg",
+      "sha256": "3bff163be26e1c6877bf6aebdd3115eda88535d32c56b8c6406c998385caaebb",
+      "bytes": 203,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "CH",
+      "asset": "flags/ch.svg",
+      "sha256": "a5ec3bbf0f3e686ea05ae17f51e8f3a287ad332217b679bbd393842b7d427859",
+      "bytes": 183,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "CI",
+      "asset": "flags/ci.svg",
+      "sha256": "aaf7093dc7c4b1e65d6cd0a65cf20dc957971205a04985897fb3980bccb3a394",
+      "bytes": 194,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "CK",
+      "asset": "flags/ck.svg",
+      "sha256": "9bd6978ba96d708f7a318c5f2f9c7b992553cc7275cd002135ea2f755c304d97",
+      "bytes": 1056,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "CL",
+      "asset": "flags/cl.svg",
+      "sha256": "ca4d50dcf36926c82f02b895975f351a639b0aa1b91bb6ef776f4f07f225cc34",
+      "bytes": 592,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "CM",
+      "asset": "flags/cm.svg",
+      "sha256": "e00c6cbb0cb7364bc1b825e145ae6232d611d0e457dfa621b6bfafa3b7c76a7f",
+      "bytes": 266,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "CN",
+      "asset": "flags/cn.svg",
+      "sha256": "ce797608958527808601798df00691aced6120bd600c0624161230020229dc99",
+      "bytes": 536,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "CO",
+      "asset": "flags/co.svg",
+      "sha256": "ec3daa5a284fc6d10104a53fd16ea77eba9ac1044ffa629f953644c1de63dcd3",
+      "bytes": 201,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "CR",
+      "asset": "flags/cr.svg",
+      "sha256": "f7e60b87265310b60217dcd26b24879222a7e5e13fe4c52ae1afdc3c6c737bbf",
+      "bytes": 63168,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "CU",
+      "asset": "flags/cu.svg",
+      "sha256": "afba6d3e29d510e256c07b23f2afc00a9cea87296765138e5645fe995d24249f",
+      "bytes": 282,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "CV",
+      "asset": "flags/cv.svg",
+      "sha256": "bcbf0add799b13377bdf842e1f380ff630650d3b7dba2d8f1273093cfa6ceb0f",
+      "bytes": 1494,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "CW",
+      "asset": "flags/cw.svg",
+      "sha256": "6e35d3452497a8e5766b9c00087b91d06e79fde18dfe6b74fb18ff72c6635bc1",
+      "bytes": 266,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "CX",
+      "asset": "flags/cx.svg",
+      "sha256": "72bc59ee3b04cf605151213d5b40033d5d6ca3b3f6c6f0abeb8c337d6cda0824",
+      "bytes": 4472,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "CY",
+      "asset": "flags/cy.svg",
+      "sha256": "4473ff55e82a2872232b71802ecf37784223bffc2f13d2e564489586f94ef691",
+      "bytes": 22643,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "CZ",
+      "asset": "flags/cz.svg",
+      "sha256": "5f4ba801f6715e2d29f8b88f785bfc77a0dc1455a0f649626ad9a0cc66cd6df2",
+      "bytes": 210,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "DE",
+      "asset": "flags/de.svg",
+      "sha256": "595d7718f6a22e5ea9de0cbbcabd857ac1892f4a6c81beb1ef936050193d9323",
+      "bytes": 186,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "DJ",
+      "asset": "flags/dj.svg",
+      "sha256": "072cd869e9430e51fe7d48b0bd33c882b6365386c9987c03cb76f802597af936",
+      "bytes": 371,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "DK",
+      "asset": "flags/dk.svg",
+      "sha256": "eb4ea9929e6491fd0444ea5da5b9a19dda089a2ac758ad63956cfbcc7fa81cc3",
+      "bytes": 165,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "DM",
+      "asset": "flags/dm.svg",
+      "sha256": "b4371e4737d00b0391dbfc43db8136f9976dfc2d348c6b9cecf598e154319edc",
+      "bytes": 4810,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "DO",
+      "asset": "flags/do.svg",
+      "sha256": "ed01134a6d931721c58fc34771e34e1d513e9e06e7241a1e6528172093c77880",
+      "bytes": 148257,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "DZ",
+      "asset": "flags/dz.svg",
+      "sha256": "51bda9bdc313fa5418550d94d46f31e0c396f4e70c810b629fac0430f4b7e638",
+      "bytes": 285,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "EC",
+      "asset": "flags/ec.svg",
+      "sha256": "59c54050d583084c7ea35fdba8e1afddb99260cc22c4fb2c81abef41144a335c",
+      "bytes": 216988,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "EE",
+      "asset": "flags/ee.svg",
+      "sha256": "a880630e92f27af0f8f183023a98ed1e9fcee60a9dbcf721d0630fec5189ed36",
+      "bytes": 183,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "EG",
+      "asset": "flags/eg.svg",
+      "sha256": "07129395f46d9e71844fe9b485e05bf49741bc72a480b567297d6d865f3d8150",
+      "bytes": 18351,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "EH",
+      "asset": "flags/eh.svg",
+      "sha256": "ce96e3879ac3d67e7a64dd55a5aa1d5bf3692a2ccbb91f6fdfd656189fcd0ae6",
+      "bytes": 504,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "ER",
+      "asset": "flags/er.svg",
+      "sha256": "69f92c176c843d7c899eaa7beaa1f75a0499d49fbb24e2053ed98be77e176498",
+      "bytes": 3251,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "ES",
+      "asset": "flags/es.svg",
+      "sha256": "d672868d51fc5b4f2d76f510c9360a4401bdb3ca805349bd04cb4ba277d5b379",
+      "bytes": 153035,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "ET",
+      "asset": "flags/et.svg",
+      "sha256": "980ec719a0be7227e6769b9bf9198b182b743b9544326f4ef2566ecd3ebfeb94",
+      "bytes": 809,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "FI",
+      "asset": "flags/fi.svg",
+      "sha256": "5d1ab833fc8f13fd2474b99286d063f2bcd4332cf859063841788f908656aa14",
+      "bytes": 194,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "FJ",
+      "asset": "flags/fj.svg",
+      "sha256": "e2c0c872c02b315510c6923a7913d1783accabab0ea1eef103a3f23165af320f",
+      "bytes": 40121,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "FK",
+      "asset": "flags/fk.svg",
+      "sha256": "3bb31afe510af3b8ad548e3f3f6ed746437d0598bcde5b66e542768572e19383",
+      "bytes": 130700,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "FM",
+      "asset": "flags/fm.svg",
+      "sha256": "d88d4388bd3ecf181378e5f7889b04a5d6ccb10e0b0b73baf8f0149c440ad5af",
+      "bytes": 686,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "FO",
+      "asset": "flags/fo.svg",
+      "sha256": "ca2942942e55bfbf77cdc0c5ab8f22a99e4f4dd03f3274ed289f955786dccd15",
+      "bytes": 269,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "FR",
+      "asset": "flags/fr.svg",
+      "sha256": "09645c97a47436337d63cd54625200542c65e0e1c83b774a58c9d28d0555b0e7",
+      "bytes": 191,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "GA",
+      "asset": "flags/ga.svg",
+      "sha256": "43e2be0bceff86a5e9611d197478256416e2ed1b106b9df24651d553bc87b41f",
+      "bytes": 201,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "GB",
+      "asset": "flags/gb.svg",
+      "sha256": "42f04826dd7a76e4ecdc9a55fb4a774a26e03a425ca1363628bb1c6f6ea1a87e",
+      "bytes": 553,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "GD",
+      "asset": "flags/gd.svg",
+      "sha256": "a2068c160dddaf85e5ac16423100c50d1970990a7468f3e81eed2d11426c689a",
+      "bytes": 1101,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "GE",
+      "asset": "flags/ge.svg",
+      "sha256": "dfba0d29f581ff00c2e46b69cc90e0e9ff6371ab92fbe300664f6622f7ca0355",
+      "bytes": 481,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "GF",
+      "asset": "flags/gf.svg",
+      "sha256": "59df62bfca4b444190219a4039f54c88d38e897d4619118c7b3f3adf20391c54",
+      "bytes": 243,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "GG",
+      "asset": "flags/gg.svg",
+      "sha256": "05fb56e4a8b3b94470f678ce261ce93ce22f08b189aa86d8441b32210c183d50",
+      "bytes": 284,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "GH",
+      "asset": "flags/gh.svg",
+      "sha256": "a8c4320f89adc39f1c43f0100031e6acfce9299aed5bf035732d00d34d44ee88",
+      "bytes": 255,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "GI",
+      "asset": "flags/gi.svg",
+      "sha256": "e5f4e6d23324e3b8682aad7033492640affac084ea7989e3f4c9a3f2a6347ee6",
+      "bytes": 4004,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "GL",
+      "asset": "flags/gl.svg",
+      "sha256": "f32a2bfa923186ebfa567af9072a38a46a4e1147a6401a44a13177d80ef63141",
+      "bytes": 199,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "GM",
+      "asset": "flags/gm.svg",
+      "sha256": "d4418b31447cb5b7ddfcc3b47f3075795700363cc97132d9ab8b2de417027b98",
+      "bytes": 246,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "GN",
+      "asset": "flags/gn.svg",
+      "sha256": "4932e18d832d6a781bc00400b69136cc9406234d3800e1e66ea809550a84b423",
+      "bytes": 205,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "GP",
+      "asset": "flags/gp.svg",
+      "sha256": "209a4c520dedebc18eb7acb4cecc8ec280c9234ac361f64738c6dcd08d93db62",
+      "bytes": 13038,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "GQ",
+      "asset": "flags/gq.svg",
+      "sha256": "c9127828406765ae4faf593ac240d82be9913bde2664ed462fc31dcae68eef52",
+      "bytes": 5658,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "GR",
+      "asset": "flags/gr.svg",
+      "sha256": "e8a25b9e3e3cb19c682410411097401626c629152f31b45482c98abea8ab12c7",
+      "bytes": 231,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "GS",
+      "asset": "flags/gs.svg",
+      "sha256": "b961866c898447bb7fc060e4d18dc6080ccad384ff4bf849260fb5577221a841",
+      "bytes": 52221,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "GT",
+      "asset": "flags/gt.svg",
+      "sha256": "d59addea6225e7eeb09efaee9a888aacc2b93651e1306a3de84764c6c729f821",
+      "bytes": 55531,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "GU",
+      "asset": "flags/gu.svg",
+      "sha256": "a5d07ad0e3b8fa236f24208d395a8d38b740f92e8d81e6856dcc3104d661a9eb",
+      "bytes": 11324,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "GW",
+      "asset": "flags/gw.svg",
+      "sha256": "00dd3c3891158fcb6de6afc3f93b8b4afc20f6aea7c344f097350fc8c9c0ffbc",
+      "bytes": 583,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "GY",
+      "asset": "flags/gy.svg",
+      "sha256": "910830b8f1f35c778f37eb37d47eea0ea952d1bf04070f7eaeb697d0f8ead948",
+      "bytes": 447,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "HK",
+      "asset": "flags/hk.svg",
+      "sha256": "4c7cbced68ee586af8b3d73a8d8a8c404deaa271da7204eb2afe5c1b070972eb",
+      "bytes": 689,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "HM",
+      "asset": "flags/hm.svg",
+      "sha256": "1fff6af9a474221a31f199401f8e247f66f04d160d917e77ec6011f975d92164",
+      "bytes": 1299,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "HN",
+      "asset": "flags/hn.svg",
+      "sha256": "d2dd47a43f01a52ffff72cc88bd0e4fc9b503dee57250d22f870c36346079c5d",
+      "bytes": 401,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "HR",
+      "asset": "flags/hr.svg",
+      "sha256": "fa44157809f7739aabca54f3e27dfb1d7409ef17afe6ac18dd39294f124e205a",
+      "bytes": 81475,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "HT",
+      "asset": "flags/ht.svg",
+      "sha256": "65839463e163fd812f732f606111c68961e9bb23aa9624c8c448605fe0e086a1",
+      "bytes": 101261,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "HU",
+      "asset": "flags/hu.svg",
+      "sha256": "2025b7ca34eac130a257abc189273adb73f5749cb0eb7c5c6d865d433d842e0b",
+      "bytes": 195,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "ID",
+      "asset": "flags/id.svg",
+      "sha256": "b9d9dea991a06a1211e93e8fa33adc6035ede25d07dc6e98cf97cc57fd94a340",
+      "bytes": 148,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "IE",
+      "asset": "flags/ie.svg",
+      "sha256": "5a2e2ec73fb75642ce2a9f9237eb472016794fb49e825f72e769d2d10dff3f11",
+      "bytes": 204,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "IL",
+      "asset": "flags/il.svg",
+      "sha256": "9e884f0c6d1001f8de2b478d3de9582f93fbbd9badcb31e3f52fefa3974ebc75",
+      "bytes": 309,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "IM",
+      "asset": "flags/im.svg",
+      "sha256": "788070565e793244f601cc111a4ef03afd8c4840b33e976da14cd1afdf4f5f35",
+      "bytes": 5036,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "IN",
+      "asset": "flags/in.svg",
+      "sha256": "ea9966697a16e75d64b4e6a9a468009944bd336e8098a34839033eb641329fcc",
+      "bytes": 720,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "IO",
+      "asset": "flags/io.svg",
+      "sha256": "b947453364148016e7c294cb66297c83dbef12604990821b46987fafba0c56fa",
+      "bytes": 16623,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "IQ",
+      "asset": "flags/iq.svg",
+      "sha256": "b0de86ef9c1cfb0067e0989bffa6f15579e0c78b331fc29a9e3469aea3cbec20",
+      "bytes": 1165,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "IR",
+      "asset": "flags/ir.svg",
+      "sha256": "8e3015ef6405ba9c80a9c93897e3d75f21e4df303f3bcf8e363ea4c96cd06272",
+      "bytes": 1298,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "IS",
+      "asset": "flags/is.svg",
+      "sha256": "b14a90783cbe55b65c663efb67e1c235389f46d60d9601d28b36773016d520e2",
+      "bytes": 249,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "IT",
+      "asset": "flags/it.svg",
+      "sha256": "7f818fa8e36ca606a8cbd35106fd7d277f094f10f2aa1f7a0585421a20e37070",
+      "bytes": 202,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "JE",
+      "asset": "flags/je.svg",
+      "sha256": "8bd0a0d80cc4e75eac8a3069be0baa9f5ac6a96813485c4f8dc65ae857c621fa",
+      "bytes": 76606,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "JM",
+      "asset": "flags/jm.svg",
+      "sha256": "44504dda9d5bff31dfbcf5c8cce7acf0bfb9a7b16a697aadca3f9c4e854b62eb",
+      "bytes": 259,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "JO",
+      "asset": "flags/jo.svg",
+      "sha256": "fb2b2896420258e37d2e27a1d07c6488b5ff14a587edfbe7c4153f93042b8424",
+      "bytes": 371,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "JP",
+      "asset": "flags/jp.svg",
+      "sha256": "e8e6f6e75bc02eeb35e5904edc13df9b5990da70ac1ff1daa7a9fcc61c709a03",
+      "bytes": 160,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "KE",
+      "asset": "flags/ke.svg",
+      "sha256": "0c65788e07b97827d85662c06cd74e83ab6027c8915579821df896446b26d4d5",
+      "bytes": 1001,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "KG",
+      "asset": "flags/kg.svg",
+      "sha256": "b6e67c6fce0ab4dcd376abf4b1656bd8bc9a654c8320d4eef45c810921a1c869",
+      "bytes": 8089,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "KH",
+      "asset": "flags/kh.svg",
+      "sha256": "bdff20910e6d11f5c5b0a562d1302f4aad792255fcdc2e9a46bce1ed8fe8c56f",
+      "bytes": 10048,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "KI",
+      "asset": "flags/ki.svg",
+      "sha256": "3c5c18f1a61d1c782f2f313f197b00530b6de5d72b3ed81814d7984d73c4e05d",
+      "bytes": 3271,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "KM",
+      "asset": "flags/km.svg",
+      "sha256": "21e3ee9de83bf7ac6b57400e92f63d81f1f174624e9a2f408a5dd23d4d8f8f04",
+      "bytes": 558,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "KN",
+      "asset": "flags/kn.svg",
+      "sha256": "5274df62085604bfd3586bc890842e0ea27a1c3dd3069571179e3eed381ed036",
+      "bytes": 539,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "KP",
+      "asset": "flags/kp.svg",
+      "sha256": "2891274f3603b50b8eb795f50ba361b7b4586ecc1f42f900689decd527fcc386",
+      "bytes": 334,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "KR",
+      "asset": "flags/kr.svg",
+      "sha256": "4e0b6d5fa63e2fc1c3d86fda025a4c2129e52d5fc6551d8355e9385dd2d88f4b",
+      "bytes": 817,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "KW",
+      "asset": "flags/kw.svg",
+      "sha256": "ce62298731cb48e5f502af92203342f43bfa9568acfc6d2194c7227760e9184c",
+      "bytes": 232,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "KY",
+      "asset": "flags/ky.svg",
+      "sha256": "30e1eff5519219c27ded9fed93ad3b2acdf898b7494411f23c2c5828d96a1e30",
+      "bytes": 35128,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "KZ",
+      "asset": "flags/kz.svg",
+      "sha256": "71a7d90e17ae74f6bf9572d9560b83d2d6ca047482fe2a229b770c67338f3848",
+      "bytes": 9636,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "LA",
+      "asset": "flags/la.svg",
+      "sha256": "c0cbe90abd407b916c31bc6d2cceb90ff61cf78ce5de00173e993c67f4e4ca15",
+      "bytes": 233,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "LB",
+      "asset": "flags/lb.svg",
+      "sha256": "2c69b33a241e21c003113bae58fda58a08113e265a94262f6d0de39277876462",
+      "bytes": 14384,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "LC",
+      "asset": "flags/lc.svg",
+      "sha256": "13f4f19e5d3a4a590ba7698e0b19df13d1dd817e4928c20fb4ba949ed8737daf",
+      "bytes": 254,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "LI",
+      "asset": "flags/li.svg",
+      "sha256": "308d212c6046d523637598a5034bdc6132706c7c3c33c5d042748226da61e8c3",
+      "bytes": 12408,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "LK",
+      "asset": "flags/lk.svg",
+      "sha256": "c6d5351f0c9d5611cdfaf64b6b5324db73b437bc9d4e4bdc8a70a7d66533df93",
+      "bytes": 19240,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "LR",
+      "asset": "flags/lr.svg",
+      "sha256": "b722560baa4a55e843b78f3a3485ff4ad31e5acd659142add4ba3990be2578cb",
+      "bytes": 675,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "LS",
+      "asset": "flags/ls.svg",
+      "sha256": "66002ab481b35579ef88633fea8114d698990afdaf94b0173e9c9d614d126b49",
+      "bytes": 1442,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "LT",
+      "asset": "flags/lt.svg",
+      "sha256": "9743f780184a60fc75a312b34151ff1a2699e0bf0d456eb91dcbae0472b4d566",
+      "bytes": 201,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "LU",
+      "asset": "flags/lu.svg",
+      "sha256": "23c57bfe462e31f5655923c458bc77769dc62679e69750f6bf96371f62287f70",
+      "bytes": 202,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "LV",
+      "asset": "flags/lv.svg",
+      "sha256": "470445d5df6d4ff5e51e0fe120a78ad2e416b86476efdf09cf921d43806fde03",
+      "bytes": 155,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "LY",
+      "asset": "flags/ly.svg",
+      "sha256": "e2b019746d67350a9dcfc595616d0b73b868c8f3757f9516665e9141d8f0c117",
+      "bytes": 353,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "MA",
+      "asset": "flags/ma.svg",
+      "sha256": "1f6f0d1bf2e6d69fc943eb0eb3a96a4e5f8473bfdd1bd6b5a4c903c6c7ee2fe2",
+      "bytes": 258,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "MC",
+      "asset": "flags/mc.svg",
+      "sha256": "bb97fd4d27f655e164f59612ad1dfd6d25a2663369ecc38b3777dd88b9c2752b",
+      "bytes": 155,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "MD",
+      "asset": "flags/md.svg",
+      "sha256": "a61c465c0aebd959715da03389b9aedcb9198ef840f578ef03cc2af0c76bfa31",
+      "bytes": 33975,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "ME",
+      "asset": "flags/me.svg",
+      "sha256": "4c5a11bc5fc1b0cdb2f7c10b5fe2f4aa50f44d970c74bf9c408fc58dcebfe66b",
+      "bytes": 108343,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "MF",
+      "asset": "flags/mf.svg",
+      "sha256": "09645c97a47436337d63cd54625200542c65e0e1c83b774a58c9d28d0555b0e7",
+      "bytes": 191,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "MG",
+      "asset": "flags/mg.svg",
+      "sha256": "00a570504860576bcb032613cb185013ce9400e05fd9c1fdc274f9664d27f9d6",
+      "bytes": 194,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "MH",
+      "asset": "flags/mh.svg",
+      "sha256": "4d9431d294c64f7e972d174778186715be741d5941e23db89a32dcffcfbfa2ab",
+      "bytes": 796,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "MK",
+      "asset": "flags/mk.svg",
+      "sha256": "72a37e581f614d791fa6d88831d06c56a0f757e5a596d8fc1189b0d8147cfda6",
+      "bytes": 366,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "ML",
+      "asset": "flags/ml.svg",
+      "sha256": "ae9516c41b4bb5385e047fc66da8e0e3e3b9360a5850c36d4b5c21950be3853c",
+      "bytes": 197,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "MM",
+      "asset": "flags/mm.svg",
+      "sha256": "2ebf5312f5a4d89646aba2320b3dce9918136bdfd42303819830fcc29e905edb",
+      "bytes": 539,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "MN",
+      "asset": "flags/mn.svg",
+      "sha256": "4f89f928fbfa245916b324dc272363ab12dba689814a9d2112023205e8e69baf",
+      "bytes": 1496,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "MO",
+      "asset": "flags/mo.svg",
+      "sha256": "f163f905ead86c901f7345c72c8bb60a898281370a8c6ea8bb15566c570b40ca",
+      "bytes": 2265,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "MP",
+      "asset": "flags/mp.svg",
+      "sha256": "f4d7305aa7c5f53025bfef7c314847ccb4576b358dd47aa89b941e49968343f0",
+      "bytes": 164695,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "MQ",
+      "asset": "flags/mq.svg",
+      "sha256": "1e7bffabcf97e379a1b56ade6c1421c3610a640045b766665c57a12d982f006e",
+      "bytes": 201,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "MR",
+      "asset": "flags/mr.svg",
+      "sha256": "1655e7ed2d848678e50138df15f3db7b37ed7a9c4f61cdf7e26cfec12d0e7057",
+      "bytes": 333,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "MS",
+      "asset": "flags/ms.svg",
+      "sha256": "a9c4f97f953a20d5441ba8003ec8496ab60ba70c11d865d30a9c2aa03bc1efa4",
+      "bytes": 9015,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "MT",
+      "asset": "flags/mt.svg",
+      "sha256": "708f8eef0bca92371fd77cdf0f567bb432f292e0fea202b97e181b011bddf3cb",
+      "bytes": 15284,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "MU",
+      "asset": "flags/mu.svg",
+      "sha256": "c35ef8388abd492cb6ddbb0b46e3be87244ec1088682de208a745c93c4852a80",
+      "bytes": 239,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "MV",
+      "asset": "flags/mv.svg",
+      "sha256": "a825c00d340b88c63605d514c9c0e74ef17c0cf10caa0d0e46bb7ebee4788dd5",
+      "bytes": 247,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "MW",
+      "asset": "flags/mw.svg",
+      "sha256": "81a7dc8d3f32fcdc7cd98408f9602f53176a7ea3645770e4d852fc3646a2e576",
+      "bytes": 787,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "MX",
+      "asset": "flags/mx.svg",
+      "sha256": "baa6f7163f307c16a5d3e36c83a09fe46adbe16adfa866d4bb2d750a79d96b92",
+      "bytes": 143318,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "MY",
+      "asset": "flags/my.svg",
+      "sha256": "1d3284c77094859fb63c1880af4f8f9a3916935a12faae060678c6e3455e956d",
+      "bytes": 662,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "MZ",
+      "asset": "flags/mz.svg",
+      "sha256": "649e978eea07a70c6e7303a5291476b3f224063070abf4f6a5f4ddcbba7c1cf6",
+      "bytes": 2757,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "NA",
+      "asset": "flags/na.svg",
+      "sha256": "ddc9fc887177f92e80fed16082c988924fbd19773ea33729fa3f2a1896d13814",
+      "bytes": 728,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "NC",
+      "asset": "flags/nc.svg",
+      "sha256": "1f0a00010879d1045c2e1f602881819877dc3b42c74960c2955e04396a259685",
+      "bytes": 1428,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "NE",
+      "asset": "flags/ne.svg",
+      "sha256": "286098862efda02108b4a8fe0c7f75b1275685be841c62a283d55412155781d9",
+      "bytes": 243,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "NF",
+      "asset": "flags/nf.svg",
+      "sha256": "224e33c2d211398fc41eaa399691312e913f08397ea80cb3931b16c289d6cbd4",
+      "bytes": 15685,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "NG",
+      "asset": "flags/ng.svg",
+      "sha256": "3dbebd9f8e31821d5fa22f976cfe9a338788fda81308f0d573e69fd9dfcce24e",
+      "bytes": 163,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "NI",
+      "asset": "flags/ni.svg",
+      "sha256": "ed4fbc934d1bde93634e8904e0c1aec45587c95a2bbfbd024aa729e9adc956d6",
+      "bytes": 23894,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "NL",
+      "asset": "flags/nl.svg",
+      "sha256": "2f7463573cdc3a0f7760c18459a3280d9272d1e6b2060909f12b95644e4fd545",
+      "bytes": 200,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "NO",
+      "asset": "flags/no.svg",
+      "sha256": "0d4b9a52f0a6bd264258baac791b39910a895bb6ca06f63477fa823a262febdc",
+      "bytes": 223,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "NP",
+      "asset": "flags/np.svg",
+      "sha256": "f4a65e693806dbb31a5b2808a88d577c72ba0e8c5872fbd1e8600ff63a77c489",
+      "bytes": 1052,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "NR",
+      "asset": "flags/nr.svg",
+      "sha256": "1db6563151cfc25388f8167a967a96b0794cde41f1bcfa3e521bdaa794af2fcc",
+      "bytes": 545,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "NU",
+      "asset": "flags/nu.svg",
+      "sha256": "33af519360a2305beb3a58a41e800b23157f49db8b508363e52de9619a7f3b69",
+      "bytes": 1023,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "NZ",
+      "asset": "flags/nz.svg",
+      "sha256": "aa29843a365d4eb21d35932172232d7d591a35fc51ac95c040c356f0f16c447e",
+      "bytes": 1746,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "OM",
+      "asset": "flags/om.svg",
+      "sha256": "38f39605556392f32fc4aa12e6db9a9c6984acd3cc7f3ccfbca9a014bc44796a",
+      "bytes": 175888,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "PA",
+      "asset": "flags/pa.svg",
+      "sha256": "8e8c7cf854aa3367d9ed9eda6c585540bde6369ef6163f435334216be4536200",
+      "bytes": 280,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "PE",
+      "asset": "flags/pe.svg",
+      "sha256": "a35cf7c9bb6ac08e6d60d9683c78318746edc82284022aef02c9d6a07540045c",
+      "bytes": 156,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "PF",
+      "asset": "flags/pf.svg",
+      "sha256": "f04ae2415d82f1ca5b3e1803d9321374821baedee0dcf5e1b5660d8c83dde39f",
+      "bytes": 5826,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "PG",
+      "asset": "flags/pg.svg",
+      "sha256": "d98adee3bf8945b389144b04bc49824c85711e1d473236971ac8a48939328064",
+      "bytes": 2969,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "PH",
+      "asset": "flags/ph.svg",
+      "sha256": "d554297356ab66a5061df4c73c3bb293381875d86175fa0508f7ac4f035eb721",
+      "bytes": 808,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "PK",
+      "asset": "flags/pk.svg",
+      "sha256": "2011fe01e332cfc8f16c861d4818bacf4ed1b6d9fa657cc246f86ab15a313768",
+      "bytes": 380,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "PL",
+      "asset": "flags/pl.svg",
+      "sha256": "da6d9e34f2007194b0082d4caac04d1744b7b27fc40098747d4bc62e0d5a5bb2",
+      "bytes": 164,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "PM",
+      "asset": "flags/pm.svg",
+      "sha256": "2e210b75c1024a800b1367b28052f6741ae2ee9d188375c0ae481284b3ab3846",
+      "bytes": 83489,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "PN",
+      "asset": "flags/pn.svg",
+      "sha256": "2affa299bd92330f8eaab9888193ca3802c47b4bbe4068c6f91eb198f7024625",
+      "bytes": 14919,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "PR",
+      "asset": "flags/pr.svg",
+      "sha256": "b7b5e25ba11680b8c7718c823fb93945e46b66b857faafa730f42bd1903baac1",
+      "bytes": 267,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "PS",
+      "asset": "flags/ps.svg",
+      "sha256": "6ccd9cbaff9c67f772dfa2154c5e178fdd7a78f07e7177a3cea431116a98afdc",
+      "bytes": 228,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "PT",
+      "asset": "flags/pt.svg",
+      "sha256": "f60337f226fba6b695f54222f63b354920b1ecb4a0ff27f16bd49983f345f4c7",
+      "bytes": 10853,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "PW",
+      "asset": "flags/pw.svg",
+      "sha256": "47fc578c8ad500ed537a46e73859b597f819474e3d0227ccd266cdd793596aa6",
+      "bytes": 157,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "PY",
+      "asset": "flags/py.svg",
+      "sha256": "5bb06bf5b8f3ea2633dcfc0d417400786c69d6b1cb681208072f4658d2838af2",
+      "bytes": 23500,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "QA",
+      "asset": "flags/qa.svg",
+      "sha256": "5332c024cb6bac6d7ca2f96347d2ce8cfc63f5bf2643a1d1e6ed6146e6b75a1d",
+      "bytes": 264,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "RE",
+      "asset": "flags/re.svg",
+      "sha256": "d331ea0782d4c246e19f4387a6faffb069c706ddc24a2340c8d2c7f780d43607",
+      "bytes": 280,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "RO",
+      "asset": "flags/ro.svg",
+      "sha256": "20c8e69585273d35ba38fe2cae0d0201445a3b410c9589f4f7053316662482e3",
+      "bytes": 203,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "RS",
+      "asset": "flags/rs.svg",
+      "sha256": "5bc4c8297033b5b31ca9496dd1ad29232aa14389dc8c93db38f99faa707ebba3",
+      "bytes": 28859,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "RU",
+      "asset": "flags/ru.svg",
+      "sha256": "eb1dbd977fdb824dcae7767ce9ec3a023e41158e81b5f524772609ddcb622025",
+      "bytes": 200,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "RW",
+      "asset": "flags/rw.svg",
+      "sha256": "21b67e23f19a1bca9b4ad87ff788b4992cebc00a6deeca1eb9c56c16b63c0de8",
+      "bytes": 894,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "SA",
+      "asset": "flags/sa.svg",
+      "sha256": "7176d38f2e39fa7c96608f5ae85bb51ba964f1b9a972b33b0d04796fe4487f71",
+      "bytes": 24613,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "SB",
+      "asset": "flags/sb.svg",
+      "sha256": "56e24d58d3912dcd3c89187ee9ec08ea09957055296e823007ad615a4485f751",
+      "bytes": 935,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "SC",
+      "asset": "flags/sc.svg",
+      "sha256": "b7a1ccdf0b210a2273426eaf334679dba7d3f5a90dddd91882beffa891bf3035",
+      "bytes": 273,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "SD",
+      "asset": "flags/sd.svg",
+      "sha256": "305064d3c23eac774752898e1b3e9ff8ab7ecdfa45495be446dc520de8415727",
+      "bytes": 229,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "SE",
+      "asset": "flags/se.svg",
+      "sha256": "426348d99d9cace2df6eaa6d6766d5a5ac21bb65a504a4ed974486cf96156b8f",
+      "bytes": 172,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "SG",
+      "asset": "flags/sg.svg",
+      "sha256": "d8782c5cc56587009a4939e9c0a95402001114eacda264417cd8f1678ff9329d",
+      "bytes": 550,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "SH",
+      "asset": "flags/sh.svg",
+      "sha256": "8ca5f24f5398983173fde419470d646b2e328a6cf9f98d77443a706dd204066d",
+      "bytes": 48705,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "SI",
+      "asset": "flags/si.svg",
+      "sha256": "31b0d198128163affed8e660033c7a5cbe3ecc726188ab678ddb5521d5e9bb4e",
+      "bytes": 1321,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "SJ",
+      "asset": "flags/sj.svg",
+      "sha256": "0d4b9a52f0a6bd264258baac791b39910a895bb6ca06f63477fa823a262febdc",
+      "bytes": 223,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "SK",
+      "asset": "flags/sk.svg",
+      "sha256": "e684da4cc4c07969475456c69ba6e9e853360d5522dd5273beec02933c5f5767",
+      "bytes": 1026,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "SL",
+      "asset": "flags/sl.svg",
+      "sha256": "21d7e0663d2b8e1d455a0e1456c63dfbb273becdacbf7c1fa0e22d915f136cf4",
+      "bytes": 194,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "SM",
+      "asset": "flags/sm.svg",
+      "sha256": "bb35493ba0a9f7e7a447f8cf4ea17fa50777db06d7266e08edd6c54593aea1c8",
+      "bytes": 95493,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "SN",
+      "asset": "flags/sn.svg",
+      "sha256": "c0593c9c104142eadae2d76bd739b28a37d2218bf1ef4b37bf8fa9655bfab087",
+      "bytes": 228,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "SO",
+      "asset": "flags/so.svg",
+      "sha256": "3a342342f94f00a74984e10743f4589e7856076df6686f05e3192cd0ee0300e1",
+      "bytes": 274,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "SR",
+      "asset": "flags/sr.svg",
+      "sha256": "098067b9dd5a6aac668c8883f9b96fe68865dc20a6f88a8859146900e389dd63",
+      "bytes": 307,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "SS",
+      "asset": "flags/ss.svg",
+      "sha256": "0f2a925c6daf8945ff257938e04b0609441f698010d80c9717904c71a54a235e",
+      "bytes": 385,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "ST",
+      "asset": "flags/st.svg",
+      "sha256": "a95075950bff55641b4274439a909c6bda8005b22c397ef6315839ce9d0dec55",
+      "bytes": 355,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "SV",
+      "asset": "flags/sv.svg",
+      "sha256": "cbd0f1c0170aad674c898a602f0e43fcf330640cbbab0653d6ae4f941f7cd83d",
+      "bytes": 248937,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "SX",
+      "asset": "flags/sx.svg",
+      "sha256": "c05d6ac73a8e70c81e47d9448d9175f4812b0f509c26ceec8f57cceb17341283",
+      "bytes": 24679,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "SY",
+      "asset": "flags/sy.svg",
+      "sha256": "114f63ff44c34361216c25e49c65ade53ba07a4607e5e917b089c60a0df6c173",
+      "bytes": 367,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "SZ",
+      "asset": "flags/sz.svg",
+      "sha256": "3d48fcbb07942d6d590bceb07f8462db36130a625022f12710e53c6cfdc51f77",
+      "bytes": 6472,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "TC",
+      "asset": "flags/tc.svg",
+      "sha256": "d32ec58140866a2108647bc648fff338819fa2478874c2b6af4340e322e7216b",
+      "bytes": 6310,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "TD",
+      "asset": "flags/td.svg",
+      "sha256": "46d9a786225c476c021be32564d43497ec48d654694379969ac86d4aec8cf8a0",
+      "bytes": 197,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "TF",
+      "asset": "flags/tf.svg",
+      "sha256": "2d5150d06ce92b0ef019ae45eeb2f1134931c2fa12ada80822430985a8735056",
+      "bytes": 1571,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "TG",
+      "asset": "flags/tg.svg",
+      "sha256": "8d50a4818de595d967b3cd0d6b0dc91ce0532b1679813af9eea27a560a7662c1",
+      "bytes": 423,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "TH",
+      "asset": "flags/th.svg",
+      "sha256": "6b5a7a862ef01de1efd7ca3526655609ef7b05cd2ee6e14eacc0436bb93da555",
+      "bytes": 201,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "TJ",
+      "asset": "flags/tj.svg",
+      "sha256": "597f154cc4f0bc5b4941c880fd2cd79c2a20a1b1d5845c86e934c4500fab78d8",
+      "bytes": 2217,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "TK",
+      "asset": "flags/tk.svg",
+      "sha256": "f3c7c4a9c8e0f52b5e3b4891a355f350a10f75cc7517a0755689705cd35e7b66",
+      "bytes": 1207,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "TL",
+      "asset": "flags/tl.svg",
+      "sha256": "1f25223cf5d05c32593ca66f0126a14bd728535a6678edb5ba84df13614c0312",
+      "bytes": 279,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "TM",
+      "asset": "flags/tm.svg",
+      "sha256": "a03b94f68d3eec97f3cdc495ceb98af910087b2623a02dc233820dfcc2ec2085",
+      "bytes": 43457,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "TN",
+      "asset": "flags/tn.svg",
+      "sha256": "b0d8964ee6ff40309779e0a1ea2780926a85edf9f1715c22ecbd04e14a4be9b4",
+      "bytes": 278,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "TO",
+      "asset": "flags/to.svg",
+      "sha256": "aaf4a1b55742a45ae01330347e723ec9d9da9b15e1e9e05cd7d1910de91eef00",
+      "bytes": 227,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "TR",
+      "asset": "flags/tr.svg",
+      "sha256": "f15da84b4e5b23f54b8177126f5711e6fd0db8d26a1b0d3cf7901d0aa8e6b7b1",
+      "bytes": 287,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "TT",
+      "asset": "flags/tt.svg",
+      "sha256": "89fa29d1f4a553154be8ae34b5f6a31e4baf6197fee40d9103ada5b80de7e31b",
+      "bytes": 225,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "TV",
+      "asset": "flags/tv.svg",
+      "sha256": "8596575d86d9ca070a2453f8fdfe7a0168d1df078e1e04ebfee804dff04069ef",
+      "bytes": 1120,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "TW",
+      "asset": "flags/tw.svg",
+      "sha256": "5e68330a1f2a298257ebbd3201512e8f947a688f4ff395df802ef7f15aeeb79b",
+      "bytes": 397,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "TZ",
+      "asset": "flags/tz.svg",
+      "sha256": "0bdf0b45ec36def31a5ef9e162fe40bbca1d78a522bde23cb4f42d5929affdbc",
+      "bytes": 383,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "UA",
+      "asset": "flags/ua.svg",
+      "sha256": "542eaacd659923163edf3b1100c43bc137cc1ad9f0e394dee94de37d40ce1fca",
+      "bytes": 160,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "UG",
+      "asset": "flags/ug.svg",
+      "sha256": "b0d36274f9eac739b04046783a38c18bebd42587a0b0b1cc3d31a32e1ec05374",
+      "bytes": 3616,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "UM",
+      "asset": "flags/um.svg",
+      "sha256": "e1792c011daad918fdbd99a21f7f46fd71018ffd052af5a7d7faf9954d593e31",
+      "bytes": 765,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "US",
+      "asset": "flags/us.svg",
+      "sha256": "e1792c011daad918fdbd99a21f7f46fd71018ffd052af5a7d7faf9954d593e31",
+      "bytes": 765,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "UY",
+      "asset": "flags/uy.svg",
+      "sha256": "856fc0e14ff877b68a68c89144852808e7a17b213d5f1dba4b9d27435c0b2f54",
+      "bytes": 5764,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "UZ",
+      "asset": "flags/uz.svg",
+      "sha256": "7ce6e8b7f4dd2a5bc050f9e538d22fde2fd371df15b751e48a29c1c3cb3df00b",
+      "bytes": 1243,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "VA",
+      "asset": "flags/va.svg",
+      "sha256": "23174e1d9538ebf371a55e0dbe1ada98b3e5062859b0c0d3b85f7f6f1427fa99",
+      "bytes": 106128,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "VC",
+      "asset": "flags/vc.svg",
+      "sha256": "c2a36b00c4c8c637b6847ed2dafb6d90b879ea298ab57d062f6ab968027e1766",
+      "bytes": 339,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "VE",
+      "asset": "flags/ve.svg",
+      "sha256": "756f64b7ab11de19928d6ee6235079200ba45477ea150b7fc3ffbd94f4fbebfe",
+      "bytes": 1888,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "VG",
+      "asset": "flags/vg.svg",
+      "sha256": "da78c74f47384b9a1a2c88dcda7dd2d615428b850c3a30f74dddba0724213559",
+      "bytes": 14771,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "VI",
+      "asset": "flags/vi.svg",
+      "sha256": "f38cfcf80eb16ae36559a4f540c45699367e4ab23cbc37c41c98e88b58b9370a",
+      "bytes": 19982,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "VN",
+      "asset": "flags/vn.svg",
+      "sha256": "bd236e52dc564431ea569bca0a7b81ae8e8663675cb24a7b6da43ff926cc147c",
+      "bytes": 194,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "VU",
+      "asset": "flags/vu.svg",
+      "sha256": "18232f22b21730b4ec64a83c709f6546465c4777c2a3ad759686c3c2dfbc2745",
+      "bytes": 2615,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "WF",
+      "asset": "flags/wf.svg",
+      "sha256": "ac87487bf4186f4e8b5d5787c7853b7f5ed980d8dcd4fcace53292ff5bc04317",
+      "bytes": 416,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "WS",
+      "asset": "flags/ws.svg",
+      "sha256": "acedd8fb18df15e9483cc8c0f30f24b7ff2299ca9006c261040e88677c0df0b3",
+      "bytes": 640,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "XK",
+      "asset": "flags/xk.svg",
+      "sha256": "d58ac2f59d0b820c66ff60f80c59d6f61dc08c22a35f181429fe996a2870d4bb",
+      "bytes": 4439,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "YE",
+      "asset": "flags/ye.svg",
+      "sha256": "a92f3989182049dc218f7698c45d8cdfc64e6f945c71f20a9d188dd01698df2d",
+      "bytes": 179,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "YT",
+      "asset": "flags/yt.svg",
+      "sha256": "39582c3280dbcddb6c8669ca5020f68e12a120c2e8c760a7580306cc56cd93d1",
+      "bytes": 31989,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "ZA",
+      "asset": "flags/za.svg",
+      "sha256": "6fbf0b68db7024ac996c92b1bbc62efe9a3bf12e469efaa29ae4fe0fa5c6da39",
+      "bytes": 566,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "ZM",
+      "asset": "flags/zm.svg",
+      "sha256": "b64a4ec9612720033a3e8de806cfdd112a8ce48f35b2ec66e013d6c5e25e3445",
+      "bytes": 5225,
+      "source": "https://flagcdn.com/svg.zip"
+    },
+    {
+      "code": "ZW",
+      "asset": "flags/zw.svg",
+      "sha256": "f0b79e8841f06a4afed5a90142b1c202776dc1d1c82328f310458d7c0ee975d9",
+      "bytes": 1744,
+      "source": "https://flagcdn.com/svg.zip"
+    }
+  ]
+}
