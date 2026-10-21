@@ -1,6 +1,9 @@
 package io.github.ivanbabiichuk.countryquest.data.repository
 
 import androidx.room.Room
+import io.github.ivanbabiichuk.countryquest.core.time.TimeProvider
+import io.github.ivanbabiichuk.countryquest.data.local.CountryCatalogLocalDataSource
+import io.github.ivanbabiichuk.countryquest.data.local.entity.CatalogSyncMetadataEntity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import io.github.ivanbabiichuk.countryquest.data.local.CountryQuestDatabase
@@ -17,6 +20,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -58,7 +62,13 @@ class CountryRepositoryRoomTest {
                 dto("MD", " ", "Invalid change"),
             )
         }
-        val repository = OfflineFirstCountryRepository(api, dao)
+        val repository = OfflineFirstCountryRepository(
+            api,
+            CountryCatalogLocalDataSource(database),
+            object : TimeProvider {
+                override fun currentTimeMillis(): Long = 500L
+            }
+        )
 
         assertEquals(CountryRefreshResult.Success(2, 4), repository.refreshCountries())
         assertEquals(
@@ -91,13 +101,20 @@ class CountryRepositoryRoomTest {
                 dto("ZZ", "Test country", "Test capital"),
             )
         }
-        val repository = OfflineFirstCountryRepository(api, dao)
+        val repository = OfflineFirstCountryRepository(
+            api,
+            CountryCatalogLocalDataSource(database),
+            object : TimeProvider {
+                override fun currentTimeMillis(): Long = 500L
+            }
+        )
 
         assertEquals(
             CountryRefreshResult.Failure(CountryRefreshFailure.STORAGE),
             repository.refreshCountries(),
         )
         assertEquals(listOf(original), dao.getCountries())
+        assertNull(database.catalogSyncMetadataDao().getMetadata())
 
         database.openHelper.writableDatabase.execSQL("DROP TRIGGER reject_test_country")
         withTimeout(5_000.milliseconds) {
@@ -109,12 +126,75 @@ class CountryRepositoryRoomTest {
         )
     }
 
+    @Test
+    fun metadataInsertFailureRollsBackCountriesAndDoesNotInventSyncTime() = runBlocking {
+        verifyMetadataFailure(previousSyncTime = null)
+    }
+
+    @Test
+    fun metadataUpdateFailureRollsBackCountriesAndPreservesPreviousSyncTime() = runBlocking {
+        verifyMetadataFailure(previousSyncTime = 100L)
+    }
+
+    private suspend fun verifyMetadataFailure(previousSyncTime: Long?) {
+        val original = entity("FR", "France", "Stored Paris")
+        dao.upsertCountries(listOf(original))
+        previousSyncTime?.let {
+            database.catalogSyncMetadataDao().upsertMetadata(
+                CatalogSyncMetadataEntity(lastSuccessfulSyncAtEpochMillis = it)
+            )
+        }
+        val operation = if (previousSyncTime == null) "INSERT" else "UPDATE"
+        // This fails after country upserts, so only the outer transaction can undo them.
+        database.openHelper.writableDatabase.execSQL(
+            """
+            CREATE TRIGGER reject_sync_time BEFORE $operation ON catalog_sync_metadata
+            BEGIN
+                SELECT RAISE(ABORT, 'forced metadata failure');
+            END
+            """.trimIndent()
+        )
+        var now = 500L
+        val repository = OfflineFirstCountryRepository(
+            object : CountriesApi {
+                override suspend fun getCountries() = listOf(
+                    dto("FR", "France", "Paris"),
+                    dto("UA", "Ukraine", "Kyiv"),
+                )
+            },
+            CountryCatalogLocalDataSource(database),
+            object : TimeProvider {
+                override fun currentTimeMillis(): Long = now
+            }
+        )
+        assertEquals(
+            CountryRefreshResult.Failure(CountryRefreshFailure.STORAGE),
+            repository.refreshCountries()
+        )
+        assertEquals(listOf(original), dao.getCountries())
+        assertEquals(
+            previousSyncTime,
+            database.catalogSyncMetadataDao().getMetadata()?.lastSuccessfulSyncAtEpochMillis
+        )
+
+        database.openHelper.writableDatabase.execSQL("DROP TRIGGER reject_sync_time")
+        now = 600L
+        withTimeout(5_000.milliseconds) {
+            assertEquals(CountryRefreshResult.Success(2, 0), repository.refreshCountries())
+        }
+        assertEquals(
+            listOf(entity("FR", "France", "Paris"), entity("UA", "Ukraine", "Kyiv")),
+            dao.getCountries()
+        )
+        assertEquals(600L, database.catalogSyncMetadataDao().getMetadata()?.lastSuccessfulSyncAtEpochMillis)
+    }
+
     private fun dto(code: String, name: String, capital: String) = CountryDto(
         alpha2Code = code, name = name, capital = capital, region = "Europe",
         languages = listOf(LanguageDto("Test language")),
         flags = FlagsDto(
             png = "https://flagcdn.com/w320/${code.lowercase()}.png",
-            svg = "https://flagcdn.com/${code.lowercase()}.svg",
+            svg = "https://flagcdn.com/${code.lowercase()}.svg"
         ),
     )
 
@@ -122,6 +202,6 @@ class CountryRepositoryRoomTest {
         code = code, name = name, capital = capital, region = "Europe",
         languages = listOf("Test language"),
         flagSvgUrl = "https://flagcdn.com/${code.lowercase()}.svg",
-        flagPngUrl = "https://flagcdn.com/w320/${code.lowercase()}.png",
+        flagPngUrl = "https://flagcdn.com/w320/${code.lowercase()}.png"
     )
 }

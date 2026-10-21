@@ -1,7 +1,8 @@
 package io.github.ivanbabiichuk.countryquest.data.repository
 
 import android.database.sqlite.SQLiteException
-import io.github.ivanbabiichuk.countryquest.data.local.dao.CountryDao
+import io.github.ivanbabiichuk.countryquest.core.time.TimeProvider
+import io.github.ivanbabiichuk.countryquest.data.local.CountryCatalogLocalDataSource
 import io.github.ivanbabiichuk.countryquest.data.mapper.toDomain
 import io.github.ivanbabiichuk.countryquest.data.mapper.toDomainOrNull
 import io.github.ivanbabiichuk.countryquest.data.mapper.toEntity
@@ -21,18 +22,19 @@ import javax.inject.Inject
 
 class OfflineFirstCountryRepository @Inject constructor(
     private val countriesApi: CountriesApi,
-    private val countryDao: CountryDao
-): CountryRepository {
+    private val localDataSource: CountryCatalogLocalDataSource,
+    private val timeProvider: TimeProvider
+) : CountryRepository {
 
     private val refreshMutex = Mutex()
 
     override fun observeCountries(): Flow<List<Country>> =
-        countryDao.observeCountries().map { entities ->
+        localDataSource.observeCountries().map { entities ->
             entities.map { it.toDomain() }
         }
 
     override suspend fun getCountries(): List<Country> =
-        countryDao.getCountries().map { it.toDomain() }
+        localDataSource.getCountries().map { it.toDomain() }
 
     override suspend fun refreshCountries(): CountryRefreshResult =
         refreshMutex.withLock {
@@ -64,7 +66,10 @@ class OfflineFirstCountryRepository @Inject constructor(
             val entities = countries.map { it.toEntity() }
 
             try {
-                countryDao.upsertCountries(entities)
+                localDataSource.saveSyncedCountries(
+                    countries = entities,
+                    syncedAtEpochMillis = timeProvider.currentTimeMillis()
+                )
             } catch (ex: SQLiteException) {
                 return@withLock failure(CountryRefreshFailure.STORAGE)
             }
