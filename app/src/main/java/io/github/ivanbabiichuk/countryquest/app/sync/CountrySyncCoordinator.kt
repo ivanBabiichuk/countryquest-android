@@ -1,5 +1,8 @@
 package io.github.ivanbabiichuk.countryquest.app.sync
 
+import io.github.ivanbabiichuk.countryquest.core.time.TimeProvider
+import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRefreshFailure
+import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRefreshResult
 import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -10,31 +13,46 @@ import javax.inject.Singleton
 
 @Singleton
 class CountrySyncCoordinator @Inject constructor(
-    private val countryRepository: CountryRepository
+    private val countryRepository: CountryRepository,
+    private val timeProvider: TimeProvider,
+    private val freshnessPolicy: CatalogFreshnessPolicy
 ) {
+
     private val _state = MutableStateFlow(CountrySyncState())
     val state = _state.asStateFlow()
 
     private val refreshMutex = Mutex()
-    private var hasAttemptedRefresh = false
+    private var hasInitialized = false
 
     suspend fun initialize() {
-        refreshInternal(onlyIfNotAttempted = true)
+        refreshInternal(force = false)
     }
 
     suspend fun refresh() {
-        refreshInternal(onlyIfNotAttempted = false)
+        refreshInternal(force = true)
     }
 
-    private suspend fun refreshInternal(
-        onlyIfNotAttempted: Boolean,
-    ) {
+    private suspend fun refreshInternal(force: Boolean) {
         if (!refreshMutex.tryLock()) return
 
         try {
-            if (onlyIfNotAttempted && hasAttemptedRefresh) return
+            if (!force && hasInitialized) return
 
-            hasAttemptedRefresh = true
+            hasInitialized = true
+
+            if (!force) {
+                val status = countryRepository.getCatalogStatus()
+                    .getOrElse {
+                        _state.value = CountrySyncState(
+                            lastResult = CountryRefreshResult.Failure(CountryRefreshFailure.STORAGE)
+                        )
+                        return
+                    }
+
+                if (!freshnessPolicy.shouldRefresh(status = status, nowEpochMillis = timeProvider.currentTimeMillis())) {
+                    return
+                }
+            }
 
             _state.value = CountrySyncState(isRefreshing = true)
 
@@ -47,7 +65,6 @@ class CountrySyncCoordinator @Inject constructor(
             _state.update {
                 it.copy(isRefreshing = false)
             }
-
             refreshMutex.unlock()
         }
     }

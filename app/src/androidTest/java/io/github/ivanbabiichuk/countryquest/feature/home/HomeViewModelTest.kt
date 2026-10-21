@@ -5,6 +5,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.github.ivanbabiichuk.countryquest.app.AppViewModel
 import io.github.ivanbabiichuk.countryquest.app.sync.CountrySyncCoordinator
 import io.github.ivanbabiichuk.countryquest.domain.model.Country
+import io.github.ivanbabiichuk.countryquest.domain.model.CountryCatalogStatus
+import io.github.ivanbabiichuk.countryquest.core.time.TimeProvider
+import io.github.ivanbabiichuk.countryquest.app.sync.CatalogFreshnessPolicy
 import io.github.ivanbabiichuk.countryquest.domain.model.CountryFlag
 import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRefreshFailure
 import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRefreshResult
@@ -28,6 +31,7 @@ import kotlinx.coroutines.withTimeout
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.time.Duration.Companion.milliseconds
 
 @RunWith(AndroidJUnit4::class)
 class HomeViewModelTest {
@@ -122,10 +126,10 @@ class HomeViewModelTest {
 
     @Test
     fun subscriptionStopsAfterGracePeriodAndResumesWithoutNetworkRefresh() = runBlocking {
-        withTimeout(12_000) {
+        withTimeout(12_000.milliseconds) {
             withContext(Dispatchers.Main.immediate) {
                 val repository = FakeRepository()
-                val home = HomeViewModel(repository, CountrySyncCoordinator(repository))
+                val home = HomeViewModel(repository, coordinator(repository))
                 val store = ViewModelStore().apply { put("home", home) }
                 val firstCollector = launch(start = CoroutineStart.UNDISPATCHED) { home.uiState.collect {} }
                 try {
@@ -179,11 +183,11 @@ class HomeViewModelTest {
 
     @Test
     fun clearingHomeDoesNotCancelStartupRequestOwnedByApp() = runBlocking {
-        withTimeout(5_000) {
+        withTimeout(5_000.milliseconds) {
             withContext(Dispatchers.Main.immediate) {
                 val finish = CompletableDeferred<CountryRefreshResult>()
                 val repository = FakeRepository().apply { refreshResponse = { finish.await() } }
-                val coordinator = CountrySyncCoordinator(repository)
+                val coordinator = coordinator(repository)
                 val app = AppViewModel(coordinator)
                 val home = HomeViewModel(repository, coordinator)
                 val appStore = ViewModelStore().apply { put("app", app) }
@@ -212,10 +216,10 @@ class HomeViewModelTest {
         repository: FakeRepository = FakeRepository(),
         block: suspend (FakeRepository, CountrySyncCoordinator, HomeViewModel) -> Unit,
     ) {
-        withTimeout(5_000) {
+        withTimeout(5_000.milliseconds) {
             withContext(Dispatchers.Main.immediate) {
                 coroutineScope {
-                    val coordinator = CountrySyncCoordinator(repository)
+                    val coordinator = coordinator(repository)
                     val home = HomeViewModel(repository, coordinator)
                     val store = ViewModelStore().apply { put("home", home) }
                     val collector = launch(start = CoroutineStart.UNDISPATCHED) { home.uiState.collect {} }
@@ -229,6 +233,14 @@ class HomeViewModelTest {
             }
         }
     }
+
+    private fun coordinator(repository: CountryRepository) = CountrySyncCoordinator(
+        repository,
+        object : TimeProvider {
+            override fun currentTimeMillis(): Long = 1_000L
+        },
+        CatalogFreshnessPolicy()
+    )
 
     private class FakeRepository : CountryRepository {
         val countries = MutableStateFlow<List<Country>>(emptyList())
@@ -251,6 +263,9 @@ class HomeViewModelTest {
                 activeObservers.value--
             }
         }
+
+        override suspend fun getCatalogStatus(): Result<CountryCatalogStatus> =
+            Result.success(CountryCatalogStatus(countries.value.size, null))
 
         override suspend fun getCountries(): List<Country> = countries.value
         override suspend fun refreshCountries(): CountryRefreshResult {

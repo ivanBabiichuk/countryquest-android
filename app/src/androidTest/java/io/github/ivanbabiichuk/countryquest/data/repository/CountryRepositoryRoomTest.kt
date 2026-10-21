@@ -1,5 +1,6 @@
 package io.github.ivanbabiichuk.countryquest.data.repository
 
+import android.database.sqlite.SQLiteException
 import androidx.room.Room
 import io.github.ivanbabiichuk.countryquest.core.time.TimeProvider
 import io.github.ivanbabiichuk.countryquest.data.local.CountryCatalogLocalDataSource
@@ -13,6 +14,7 @@ import io.github.ivanbabiichuk.countryquest.data.remote.CountriesApi
 import io.github.ivanbabiichuk.countryquest.data.remote.dto.CountryDto
 import io.github.ivanbabiichuk.countryquest.data.remote.dto.FlagsDto
 import io.github.ivanbabiichuk.countryquest.data.remote.dto.LanguageDto
+import io.github.ivanbabiichuk.countryquest.domain.model.CountryCatalogStatus
 import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRefreshFailure
 import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRefreshResult
 import kotlinx.coroutines.flow.first
@@ -21,6 +23,7 @@ import kotlinx.coroutines.withTimeout
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -135,6 +138,48 @@ class CountryRepositoryRoomTest {
     fun metadataUpdateFailureRollsBackCountriesAndPreservesPreviousSyncTime() = runBlocking {
         verifyMetadataFailure(previousSyncTime = 100L)
     }
+
+    @Test
+    fun emptyCatalogHasZeroCountriesAndUnknownSyncTime() = runBlocking {
+        assertEquals(CountryCatalogStatus(0, null), repositoryForStatus().getCatalogStatus().getOrThrow())
+    }
+
+    @Test
+    fun legacyCatalogKeepsUnknownSyncTime() = runBlocking {
+        dao.upsertCountries(listOf(entity("UA", "Ukraine", "Kyiv")))
+        assertEquals(CountryCatalogStatus(1, null), repositoryForStatus().getCatalogStatus().getOrThrow())
+    }
+
+    @Test
+    fun catalogStatusReflectsAtomicSaveAndCountsUpsertsWithoutDuplicates() = runBlocking {
+        val source = CountryCatalogLocalDataSource(database)
+        source.saveSyncedCountries(listOf(entity("UA", "Ukraine", "Kyiv")), 100L)
+        assertEquals(CountryCatalogStatus(1, 100L), repositoryForStatus().getCatalogStatus().getOrThrow())
+        source.saveSyncedCountries(
+            listOf(entity("UA", "Ukraine", "Updated Kyiv"), entity("FR", "France", "Paris")),
+            200L,
+        )
+        assertEquals(CountryCatalogStatus(2, 200L), repositoryForStatus().getCatalogStatus().getOrThrow())
+    }
+
+    @Test
+    fun catalogReadSqliteFailureIsReturnedWithoutNetworkRequest() = runBlocking {
+        database.openHelper.writableDatabase.execSQL("DROP TABLE catalog_sync_metadata")
+        val result = repositoryForStatus().getCatalogStatus()
+        assertTrue(result.isFailure)
+        assertTrue(result.exceptionOrNull() is SQLiteException)
+    }
+
+    private fun repositoryForStatus() = OfflineFirstCountryRepository(
+        object : CountriesApi {
+            override suspend fun getCountries(): List<CountryDto> =
+                error("Reading catalog status must not request the API")
+        },
+        CountryCatalogLocalDataSource(database),
+        object : TimeProvider {
+            override fun currentTimeMillis(): Long = error("Reading status must not read the clock")
+        }
+    )
 
     private suspend fun verifyMetadataFailure(previousSyncTime: Long?) {
         val original = entity("FR", "France", "Stored Paris")

@@ -8,6 +8,7 @@ import io.github.ivanbabiichuk.countryquest.data.mapper.toDomainOrNull
 import io.github.ivanbabiichuk.countryquest.data.mapper.toEntity
 import io.github.ivanbabiichuk.countryquest.data.remote.CountriesApi
 import io.github.ivanbabiichuk.countryquest.domain.model.Country
+import io.github.ivanbabiichuk.countryquest.domain.model.CountryCatalogStatus
 import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRefreshFailure
 import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRefreshResult
 import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRepository
@@ -35,6 +36,13 @@ class OfflineFirstCountryRepository @Inject constructor(
 
     override suspend fun getCountries(): List<Country> =
         localDataSource.getCountries().map { it.toDomain() }
+
+    override suspend fun getCatalogStatus(): Result<CountryCatalogStatus> =
+        try {
+            Result.success(localDataSource.getCatalogStatus())
+        } catch (ex: SQLiteException) {
+            Result.failure(ex)
+        }
 
     override suspend fun refreshCountries(): CountryRefreshResult =
         refreshMutex.withLock {

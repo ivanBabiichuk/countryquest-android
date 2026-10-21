@@ -3,6 +3,7 @@ package io.github.ivanbabiichuk.countryquest.data.local
 import androidx.room.withTransaction
 import io.github.ivanbabiichuk.countryquest.data.local.entity.CatalogSyncMetadataEntity
 import io.github.ivanbabiichuk.countryquest.data.local.entity.CountryEntity
+import io.github.ivanbabiichuk.countryquest.domain.model.CountryCatalogStatus
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -29,4 +30,15 @@ class CountryCatalogLocalDataSource @Inject constructor(
             )
         }
     }
+
+    suspend fun getCatalogStatus(): CountryCatalogStatus =
+        database.withTransaction {
+            CountryCatalogStatus(
+                countriesCount = database.countryDao().getCountriesCount(),
+                lastSuccessfulSyncAtEpochMillis = database
+                    .catalogSyncMetadataDao()
+                    .getMetadata()
+                    ?.lastSuccessfulSyncAtEpochMillis
+            )
+        }
 }

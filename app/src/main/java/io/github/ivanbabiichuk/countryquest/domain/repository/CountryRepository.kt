@@ -1,6 +1,7 @@
 package io.github.ivanbabiichuk.countryquest.domain.repository
 
 import io.github.ivanbabiichuk.countryquest.domain.model.Country
+import io.github.ivanbabiichuk.countryquest.domain.model.CountryCatalogStatus
 import kotlinx.coroutines.flow.Flow
 
 interface CountryRepository {
@@ -10,5 +11,7 @@ interface CountryRepository {
     suspend fun getCountries(): List<Country>
 
     suspend fun refreshCountries(): CountryRefreshResult
+
+    suspend fun getCatalogStatus(): Result<CountryCatalogStatus>
 
 }

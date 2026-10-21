@@ -18,4 +18,7 @@ interface CountryDao {
     @Upsert
     suspend fun upsertCountries(countries: List<CountryEntity>)
 
+    @Query("SELECT COUNT(*) FROM countries")
+    suspend fun getCountriesCount(): Int
+
 }

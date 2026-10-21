@@ -1,6 +1,9 @@
 package io.github.ivanbabiichuk.countryquest.app.sync
 
 import io.github.ivanbabiichuk.countryquest.domain.model.Country
+import io.github.ivanbabiichuk.countryquest.domain.model.CountryCatalogStatus
+import io.github.ivanbabiichuk.countryquest.core.time.TimeProvider
+import java.io.IOException
 import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRefreshFailure
 import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRefreshResult
 import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRepository
@@ -24,7 +27,7 @@ class CountrySyncCoordinatorTest {
     @Test
     fun `initial state is idle and construction does not request data`() {
         val repository = FakeRepository()
-        val coordinator = CountrySyncCoordinator(repository)
+        val coordinator = coordinator(repository)
         assertEquals(CountrySyncState(), coordinator.state.value)
         assertEquals(0, repository.calls)
     }
@@ -32,7 +35,7 @@ class CountrySyncCoordinatorTest {
     @Test
     fun `initialize refreshes once and preserves the first result`() = runBlocking {
         val repository = FakeRepository()
-        val coordinator = CountrySyncCoordinator(repository)
+        val coordinator = coordinator(repository)
         coordinator.initialize()
         coordinator.initialize()
         assertEquals(1, repository.calls)
@@ -43,7 +46,7 @@ class CountrySyncCoordinatorTest {
     fun `failed initialization is retried manually but not automatically`() = runBlocking {
         val failure = CountryRefreshResult.Failure(CountryRefreshFailure.NETWORK)
         val repository = FakeRepository { failure }
-        val coordinator = CountrySyncCoordinator(repository)
+        val coordinator = coordinator(repository)
         coordinator.initialize()
         coordinator.initialize()
         assertEquals(1, repository.calls)
@@ -58,7 +61,7 @@ class CountrySyncCoordinatorTest {
     @Test
     fun `manual refresh before initialization prevents a redundant startup request`() = runBlocking {
         val repository = FakeRepository()
-        val coordinator = CountrySyncCoordinator(repository)
+        val coordinator = coordinator(repository)
         coordinator.refresh()
         coordinator.initialize()
         assertEquals(1, repository.calls)
@@ -68,7 +71,7 @@ class CountrySyncCoordinatorTest {
     fun `refresh exposes busy state and clears previous result until completion`() = runBlocking {
         withTimeout(5_000.milliseconds) {
             val repository = FakeRepository()
-            val coordinator = CountrySyncCoordinator(repository)
+            val coordinator = coordinator(repository)
             coordinator.initialize()
             val finish = CompletableDeferred<CountryRefreshResult>()
             repository.response = { finish.await() }
@@ -87,7 +90,7 @@ class CountrySyncCoordinatorTest {
         withTimeout(5_000.milliseconds) {
             val finish = CompletableDeferred<Unit>()
             val repository = FakeRepository { finish.await(); success }
-            val coordinator = CountrySyncCoordinator(repository)
+            val coordinator = coordinator(repository)
             val first = async(start = CoroutineStart.UNDISPATCHED) { coordinator.initialize() }
             coordinator.initialize()
             coordinator.refresh()
@@ -107,7 +110,7 @@ class CountrySyncCoordinatorTest {
     fun `cancellation clears busy state and releases lock for manual retry`() = runBlocking {
         withTimeout(5_000.milliseconds) {
             val repository = FakeRepository { awaitCancellation() }
-            val coordinator = CountrySyncCoordinator(repository)
+            val coordinator = coordinator(repository)
             val request = async(start = CoroutineStart.UNDISPATCHED) { coordinator.initialize() }
             assertTrue(coordinator.state.value.isRefreshing)
             request.cancelAndJoin()
@@ -124,7 +127,7 @@ class CountrySyncCoordinatorTest {
     fun `unexpected exception propagates without leaving coordinator locked`() = runBlocking {
         val bug = IllegalStateException("Unexpected bug")
         val repository = FakeRepository { throw bug }
-        val coordinator = CountrySyncCoordinator(repository)
+        val coordinator = coordinator(repository)
         try {
             coordinator.refresh()
             fail("Unexpected exception must propagate")
@@ -137,9 +140,140 @@ class CountrySyncCoordinatorTest {
         assertEquals(CountrySyncState(lastResult = success), coordinator.state.value)
     }
 
+    @Test
+    fun `fresh catalog skips startup request and is checked once`() = runBlocking {
+        val repository = FakeRepository()
+        repository.statusResponse = { Result.success(CountryCatalogStatus(10, NOW - DAY + 1)) }
+        val coordinator = coordinator(repository)
+        coordinator.initialize()
+        coordinator.initialize()
+        assertEquals(1, repository.statusCalls)
+        assertEquals(0, repository.calls)
+        assertEquals(CountrySyncState(), coordinator.state.value)
+    }
+
+    @Test
+    fun `stale catalog at exact age limit triggers request`() = runBlocking {
+        val repository = FakeRepository()
+        repository.statusResponse = { Result.success(CountryCatalogStatus(10, NOW - DAY)) }
+        coordinator(repository).initialize()
+        assertEquals(1, repository.calls)
+    }
+
+    @Test
+    fun `empty catalog refreshes even with recent timestamp`() = runBlocking {
+        val repository = FakeRepository()
+        repository.statusResponse = { Result.success(CountryCatalogStatus(0, NOW)) }
+        coordinator(repository).initialize()
+        assertEquals(1, repository.calls)
+    }
+
+    @Test
+    fun `legacy catalog without timestamp refreshes`() = runBlocking {
+        val repository = FakeRepository()
+        repository.statusResponse = { Result.success(CountryCatalogStatus(10, null)) }
+        coordinator(repository).initialize()
+        assertEquals(1, repository.calls)
+    }
+
+    @Test
+    fun `manual refresh bypasses freshness and status read`() = runBlocking {
+        val repository = FakeRepository()
+        repository.statusResponse = { Result.success(CountryCatalogStatus(10, NOW)) }
+        val coordinator = coordinator(repository)
+        coordinator.initialize()
+        repository.statusResponse = { error("Manual refresh must not read status") }
+        coordinator.refresh()
+        assertEquals(1, repository.statusCalls)
+        assertEquals(1, repository.calls)
+        assertEquals(CountrySyncState(lastResult = success), coordinator.state.value)
+    }
+
+    @Test
+    fun `status read failure reports storage error and allows manual retry`() = runBlocking {
+        val repository = FakeRepository()
+        repository.statusResponse = { Result.failure(IOException("Storage unavailable")) }
+        val coordinator = coordinator(repository)
+        coordinator.initialize()
+        coordinator.initialize()
+        assertEquals(1, repository.statusCalls)
+        assertEquals(0, repository.calls)
+        assertEquals(
+            CountrySyncState(lastResult = CountryRefreshResult.Failure(CountryRefreshFailure.STORAGE)),
+            coordinator.state.value,
+        )
+        coordinator.refresh()
+        assertEquals(1, repository.calls)
+        assertEquals(CountrySyncState(lastResult = success), coordinator.state.value)
+    }
+
+    @Test
+    fun `cancellation while reading status propagates and releases lock`() = runBlocking {
+        withTimeout(5_000.milliseconds) {
+            val repository = FakeRepository()
+            val reading = CompletableDeferred<Unit>()
+            repository.statusResponse = {
+                reading.complete(Unit)
+                awaitCancellation()
+            }
+            val coordinator = coordinator(repository)
+            val initialization = async { coordinator.initialize() }
+            reading.await()
+            initialization.cancelAndJoin()
+            assertTrue(initialization.isCancelled)
+            assertEquals(CountrySyncState(), coordinator.state.value)
+            assertEquals(0, repository.calls)
+            coordinator.refresh()
+            assertEquals(CountrySyncState(lastResult = success), coordinator.state.value)
+        }
+    }
+
+    @Test
+    fun `overlapping refresh is ignored while startup reads status`() = runBlocking {
+        withTimeout(5_000.milliseconds) {
+            val repository = FakeRepository()
+            val reading = CompletableDeferred<Unit>()
+            val finishRead = CompletableDeferred<Unit>()
+            repository.statusResponse = {
+                reading.complete(Unit)
+                finishRead.await()
+                Result.success(CountryCatalogStatus(0, null))
+            }
+            val coordinator = coordinator(repository)
+            val initialization = async { coordinator.initialize() }
+            reading.await()
+            coordinator.initialize()
+            coordinator.refresh()
+            assertEquals(1, repository.statusCalls)
+            assertEquals(0, repository.calls)
+            finishRead.complete(Unit)
+            initialization.await()
+            assertEquals(1, repository.calls)
+            coordinator.refresh()
+            assertEquals(2, repository.calls)
+        }
+    }
+
+    private fun coordinator(repository: CountryRepository) = CountrySyncCoordinator(
+        repository,
+        object : TimeProvider {
+            override fun currentTimeMillis(): Long = NOW
+        },
+        CatalogFreshnessPolicy()
+    )
+
     private class FakeRepository(
         var response: suspend () -> CountryRefreshResult = { success },
     ) : CountryRepository {
+        var statusCalls = 0
+            private set
+        var statusResponse: suspend () -> Result<CountryCatalogStatus> = {
+            Result.success(CountryCatalogStatus(0, null))
+        }
+        override suspend fun getCatalogStatus(): Result<CountryCatalogStatus> {
+            statusCalls++
+            return statusResponse()
+        }
         var calls = 0
             private set
         override fun observeCountries(): Flow<List<Country>> = flowOf(emptyList())
@@ -151,6 +285,8 @@ class CountrySyncCoordinatorTest {
     }
 
     private companion object {
+        const val DAY = 86_400_000L
+        const val NOW = DAY * 10
         val success = CountryRefreshResult.Success(10, 0)
     }
 }
