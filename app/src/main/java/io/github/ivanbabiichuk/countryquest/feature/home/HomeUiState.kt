@@ -7,7 +7,8 @@ data class HomeUiState(
     val isReadingCatalog: Boolean = true,
     val hasCatalogReadError: Boolean = false,
     val isRefreshing: Boolean = false,
-    val lastRefreshResult: CountryRefreshResult? = null
+    val lastRefreshResult: CountryRefreshResult? = null,
+    val lastSuccessfulSyncAtEpochMillis: Long? = null
 ) {
     val hasCountries: Boolean
         get() = countriesCount > 0

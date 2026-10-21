@@ -13,6 +13,7 @@ import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRefreshFail
 import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRefreshResult
 import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -43,6 +44,16 @@ class OfflineFirstCountryRepository @Inject constructor(
         } catch (ex: SQLiteException) {
             Result.failure(ex)
         }
+
+    override fun observeCatalogStatus(): Flow<CountryCatalogStatus> =
+        localDataSource.observeCatalogStatus()
+            .map { row ->
+                CountryCatalogStatus(
+                    countriesCount = row.countriesCount,
+                    lastSuccessfulSyncAtEpochMillis = row.lastSuccessfulSyncAtEpochMillis
+                )
+            }
+            .distinctUntilChanged()
 
     override suspend fun refreshCountries(): CountryRefreshResult =
         refreshMutex.withLock {

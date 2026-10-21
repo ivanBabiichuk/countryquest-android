@@ -17,6 +17,10 @@ import io.github.ivanbabiichuk.countryquest.data.remote.dto.LanguageDto
 import io.github.ivanbabiichuk.countryquest.domain.model.CountryCatalogStatus
 import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRefreshFailure
 import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRefreshResult
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
@@ -168,6 +172,34 @@ class CountryRepositoryRoomTest {
         val result = repositoryForStatus().getCatalogStatus()
         assertTrue(result.isFailure)
         assertTrue(result.exceptionOrNull() is SQLiteException)
+    }
+
+    @Test
+    fun existingObserverReceivesCountriesMetadataAndAtomicSyncSnapshots() = runBlocking {
+        withTimeout(5_000.milliseconds) {
+            val snapshots = Channel<CountryCatalogStatus>(Channel.UNLIMITED)
+            val observer = launch(start = CoroutineStart.UNDISPATCHED) {
+                repositoryForStatus().observeCatalogStatus().collect { snapshots.send(it) }
+            }
+            try {
+                assertEquals(CountryCatalogStatus(0, null), snapshots.receive())
+                dao.upsertCountries(listOf(entity("UA", "Ukraine", "Kyiv")))
+                assertEquals(CountryCatalogStatus(1, null), snapshots.receive())
+                database.catalogSyncMetadataDao().upsertMetadata(
+                    CatalogSyncMetadataEntity(lastSuccessfulSyncAtEpochMillis = 100L)
+                )
+                assertEquals(CountryCatalogStatus(1, 100L), snapshots.receive())
+                CountryCatalogLocalDataSource(database).saveSyncedCountries(
+                    listOf(entity("UA", "Ukraine", "Kyiv"), entity("FR", "France", "Paris")),
+                    200L
+                )
+                // No mixed snapshot such as new count with the previous timestamp.
+                assertEquals(CountryCatalogStatus(2, 200L), snapshots.receive())
+            } finally {
+                observer.cancelAndJoin()
+                snapshots.close()
+            }
+        }
     }
 
     private fun repositoryForStatus() = OfflineFirstCountryRepository(

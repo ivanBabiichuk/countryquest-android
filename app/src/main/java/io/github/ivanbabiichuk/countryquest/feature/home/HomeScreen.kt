@@ -17,6 +17,8 @@ import io.github.ivanbabiichuk.countryquest.domain.model.QuizMode
 import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRefreshFailure
 import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRefreshResult
 import io.github.ivanbabiichuk.countryquest.ui.theme.CountryQuestTheme
+import java.text.DateFormat
+import java.util.Date
 
 @Composable
 fun HomeScreen(
@@ -93,6 +95,23 @@ private fun HomeCatalogStatus(
 
         uiState.hasCountries -> {
             Text("Saved countries: ${uiState.countriesCount}")
+
+            val lastSync = uiState.lastSuccessfulSyncAtEpochMillis
+
+            Text(
+                text = if (lastSync != null) {
+                    val formattedDate = DateFormat.getDateTimeInstance(
+                        DateFormat.MEDIUM,
+                        DateFormat.SHORT
+                    ).format(Date(lastSync))
+
+                    "Last updated: $formattedDate"
+                } else {
+                    "Last update time is unknown."
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
 
         else -> {
@@ -123,7 +142,7 @@ private fun HomeCatalogStatus(
                     "No usable country data was received."
 
                 CountryRefreshFailure.STORAGE ->
-                    "Could not save the country catalog."
+                    "Could not access the country catalog."
             }
 
             Text(
@@ -166,6 +185,7 @@ private fun HomeScreenPreview() {
                 uiState = HomeUiState(
                     countriesCount = 250,
                     isReadingCatalog = false,
+                    lastSuccessfulSyncAtEpochMillis = 1_700_000_000_000L
                 ),
                 onRefreshCountries = {},
                 onStartQuiz = {},

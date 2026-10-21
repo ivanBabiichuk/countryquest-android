@@ -276,6 +276,8 @@ class CountrySyncCoordinatorTest {
         }
         var calls = 0
             private set
+        override fun observeCatalogStatus(): Flow<CountryCatalogStatus> =
+            error("Coordinator must use a status snapshot, not observe it")
         override fun observeCountries(): Flow<List<Country>> = flowOf(emptyList())
         override suspend fun getCountries(): List<Country> = emptyList()
         override suspend fun refreshCountries(): CountryRefreshResult {

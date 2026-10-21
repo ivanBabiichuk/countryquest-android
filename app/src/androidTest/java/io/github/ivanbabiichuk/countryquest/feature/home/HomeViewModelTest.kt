@@ -8,7 +8,6 @@ import io.github.ivanbabiichuk.countryquest.domain.model.Country
 import io.github.ivanbabiichuk.countryquest.domain.model.CountryCatalogStatus
 import io.github.ivanbabiichuk.countryquest.core.time.TimeProvider
 import io.github.ivanbabiichuk.countryquest.app.sync.CatalogFreshnessPolicy
-import io.github.ivanbabiichuk.countryquest.domain.model.CountryFlag
 import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRefreshFailure
 import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRefreshResult
 import io.github.ivanbabiichuk.countryquest.domain.repository.CountryRepository
@@ -39,10 +38,10 @@ class HomeViewModelTest {
     fun homeObservesLocalChangesWithoutStartingRefresh() = runBlocking {
         withHome { repository, _, home ->
             assertEquals(0, home.awaitReady().countriesCount)
-            repository.countries.value = listOf(country("UA"))
+            repository.status.value = CountryCatalogStatus(1, null)
             val populated = home.uiState.first { it.countriesCount == 1 }
             assertTrue(populated.hasCountries)
-            repository.countries.value = emptyList()
+            repository.status.value = CountryCatalogStatus(0, null)
             val empty = home.uiState.first { !it.isReadingCatalog && it.countriesCount == 0 }
             assertFalse(empty.hasCountries)
             assertEquals(0, repository.refreshCalls)
@@ -52,7 +51,7 @@ class HomeViewModelTest {
     @Test
     fun appInitializationIsSharedWithHomeAndRunsOnlyOnce() = runBlocking {
         withHome { repository, coordinator, home ->
-            repository.countries.value = listOf(country("UA"), country("FR"))
+            repository.status.value = CountryCatalogStatus(2, null)
             home.uiState.first { it.countriesCount == 2 }
             val finish = CompletableDeferred<CountryRefreshResult>()
             repository.refreshResponse = { finish.await() }
@@ -81,7 +80,7 @@ class HomeViewModelTest {
     @Test
     fun manualRefreshFailurePreservesCatalogAndRetryClearsPreviousError() = runBlocking {
         withHome { repository, _, home ->
-            repository.countries.value = listOf(country("UA"))
+            repository.status.value = CountryCatalogStatus(1, null)
             home.uiState.first { it.countriesCount == 1 }
             val failure = CountryRefreshResult.Failure(CountryRefreshFailure.NETWORK)
             repository.refreshResponse = { failure }
@@ -110,7 +109,7 @@ class HomeViewModelTest {
             val failed = home.uiState.first { it.hasCatalogReadError }
             assertFalse(failed.isReadingCatalog)
             assertEquals(0, repo.activeObservers.value)
-            repo.countries.value = listOf(country("UA"))
+            repo.status.value = CountryCatalogStatus(1, null)
 
             home.refreshCountries()
             val recovered = home.uiState.first { !it.hasCatalogReadError && it.countriesCount == 1 }
@@ -118,7 +117,7 @@ class HomeViewModelTest {
             assertEquals(2, repo.observationStarts)
             assertEquals(1, repo.activeObservers.value)
 
-            repo.countries.value = listOf(country("UA"), country("FR"))
+            repo.status.value = CountryCatalogStatus(2, null)
             home.uiState.first { it.countriesCount == 2 }
             assertEquals(1, repo.refreshCalls)
         }
@@ -137,7 +136,7 @@ class HomeViewModelTest {
                     assertEquals(1, repository.activeObservers.value)
                     firstCollector.cancelAndJoin()
                     repository.activeObservers.first { it == 0 }
-                    repository.countries.value = listOf(country("UA"))
+                    repository.status.value = CountryCatalogStatus(1, null)
                     // A new collector restarts Room observation after WhileSubscribed stopped it.
                     home.uiState.first { !it.isReadingCatalog && it.countriesCount == 1 }
                     assertEquals(2, repository.observationStarts)
@@ -209,6 +208,59 @@ class HomeViewModelTest {
         }
     }
 
+    @Test
+    fun syncTimeUpdatesEvenWhenCountryCountDoesNotChange() = runBlocking {
+        withHome { repository, _, home ->
+            repository.status.value = CountryCatalogStatus(2, 100L)
+            val initial = home.uiState.first { it.lastSuccessfulSyncAtEpochMillis == 100L }
+            assertEquals(2, initial.countriesCount)
+            repository.status.value = CountryCatalogStatus(2, 200L)
+            val updated = home.uiState.first { it.lastSuccessfulSyncAtEpochMillis == 200L }
+            assertEquals(2, updated.countriesCount)
+            assertEquals(0, repository.refreshCalls)
+            assertEquals(1, repository.observationStarts)
+        }
+    }
+
+    @Test
+    fun failedRefreshKeepsStoredTimeAndSuccessfulRetryReceivesNewTime() = runBlocking {
+        withHome { repository, _, home ->
+            repository.status.value = CountryCatalogStatus(2, 100L)
+            home.uiState.first { it.lastSuccessfulSyncAtEpochMillis == 100L }
+            val failure = CountryRefreshResult.Failure(CountryRefreshFailure.NETWORK)
+            repository.refreshResponse = { failure }
+            home.refreshCountries()
+            val failed = home.uiState.first { !it.isRefreshing && it.lastRefreshResult == failure }
+            assertEquals(100L, failed.lastSuccessfulSyncAtEpochMillis)
+            assertEquals(2, failed.countriesCount)
+
+            repository.refreshResponse = {
+                repository.status.value = CountryCatalogStatus(2, 200L)
+                CountryRefreshResult.Success(2, 0)
+            }
+            home.refreshCountries()
+            val recovered = home.uiState.first {
+                !it.isRefreshing &&
+                    it.lastRefreshResult is CountryRefreshResult.Success &&
+                    it.lastSuccessfulSyncAtEpochMillis == 200L
+            }
+            assertEquals(2, recovered.countriesCount)
+            assertEquals(1, repository.observationStarts)
+        }
+    }
+
+    @Test
+    fun legacyCatalogHasUnknownTimeUntilSyncMetadataArrives() = runBlocking {
+        withHome { repository, _, home ->
+            repository.status.value = CountryCatalogStatus(1, null)
+            val legacy = home.uiState.first { it.countriesCount == 1 }
+            assertNull(legacy.lastSuccessfulSyncAtEpochMillis)
+            repository.status.value = CountryCatalogStatus(1, 300L)
+            home.uiState.first { it.lastSuccessfulSyncAtEpochMillis == 300L }
+            assertEquals(0, repository.refreshCalls)
+        }
+    }
+
     private suspend fun HomeViewModel.awaitReady(): HomeUiState =
         uiState.first { !it.isReadingCatalog }
 
@@ -243,14 +295,17 @@ class HomeViewModelTest {
     )
 
     private class FakeRepository : CountryRepository {
-        val countries = MutableStateFlow<List<Country>>(emptyList())
+        val status = MutableStateFlow(CountryCatalogStatus(0, null))
         val activeObservers = MutableStateFlow(0)
         var observationStarts = 0
         var refreshCalls = 0
         var failNextObservation = false
         var refreshResponse: suspend () -> CountryRefreshResult = { CountryRefreshResult.Success(1, 0) }
 
-        override fun observeCountries(): Flow<List<Country>> = flow {
+        override fun observeCountries(): Flow<List<Country>> =
+            error("Home must observe catalog status instead of loading all countries")
+
+        override fun observeCatalogStatus(): Flow<CountryCatalogStatus> = flow {
             observationStarts++
             activeObservers.value++
             try {
@@ -258,24 +313,20 @@ class HomeViewModelTest {
                     failNextObservation = false
                     throw IOException("Simulated local read failure")
                 }
-                emitAll(countries)
+                emitAll(status)
             } finally {
                 activeObservers.value--
             }
         }
 
         override suspend fun getCatalogStatus(): Result<CountryCatalogStatus> =
-            Result.success(CountryCatalogStatus(countries.value.size, null))
+            Result.success(status.value)
 
-        override suspend fun getCountries(): List<Country> = countries.value
+        override suspend fun getCountries(): List<Country> = error("Home must not read all countries")
         override suspend fun refreshCountries(): CountryRefreshResult {
             refreshCalls++
             return refreshResponse()
         }
     }
 
-    private fun country(code: String) = Country(
-        code = code, name = "Country $code", capital = null, region = "Europe",
-        languages = emptyList(), flag = CountryFlag(null, null),
-    )
 }
