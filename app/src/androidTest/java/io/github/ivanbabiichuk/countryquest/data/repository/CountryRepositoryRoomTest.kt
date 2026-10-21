@@ -2,6 +2,10 @@ package io.github.ivanbabiichuk.countryquest.data.repository
 
 import android.database.sqlite.SQLiteException
 import androidx.room.Room
+import io.github.ivanbabiichuk.countryquest.app.di.NetworkModule
+import io.github.ivanbabiichuk.countryquest.data.local.seed.CountrySeedDataSource
+import io.github.ivanbabiichuk.countryquest.data.local.seed.SeedCatalogParser
+
 import io.github.ivanbabiichuk.countryquest.core.time.TimeProvider
 import io.github.ivanbabiichuk.countryquest.data.local.CountryCatalogLocalDataSource
 import io.github.ivanbabiichuk.countryquest.data.local.entity.CatalogSyncMetadataEntity
@@ -74,15 +78,16 @@ class CountryRepositoryRoomTest {
             CountryCatalogLocalDataSource(database),
             object : TimeProvider {
                 override fun currentTimeMillis(): Long = 500L
-            }
+            },
+            seedDataSource()
         )
 
         assertEquals(CountryRefreshResult.Success(2, 4), repository.refreshCountries())
         assertEquals(
             listOf(germany, entity("FR", "France", "Paris"), moldova, poland, entity("UA", "Ukraine", "Kyiv")),
-            dao.getCountries(),
+            dao.getCountries()
         )
-        val observed = withTimeout(5_000) { repository.observeCountries().first() }
+        val observed = withTimeout(5_000.milliseconds) { repository.observeCountries().first() }
         assertEquals(listOf("DE", "FR", "MD", "PL", "UA"), observed.map { it.code })
         assertEquals("https://flagcdn.com/ua.svg", observed.last().flag.svgUrl)
         assertEquals("https://flagcdn.com/w320/ua.png", observed.last().flag.pngUrl)
@@ -113,12 +118,13 @@ class CountryRepositoryRoomTest {
             CountryCatalogLocalDataSource(database),
             object : TimeProvider {
                 override fun currentTimeMillis(): Long = 500L
-            }
+            },
+            seedDataSource()
         )
 
         assertEquals(
             CountryRefreshResult.Failure(CountryRefreshFailure.STORAGE),
-            repository.refreshCountries(),
+            repository.refreshCountries()
         )
         assertEquals(listOf(original), dao.getCountries())
         assertNull(database.catalogSyncMetadataDao().getMetadata())
@@ -129,7 +135,7 @@ class CountryRepositoryRoomTest {
         }
         assertEquals(
             listOf(entity("FR", "France", "Paris"), entity("ZZ", "Test country", "Test capital")),
-            dao.getCountries(),
+            dao.getCountries()
         )
     }
 
@@ -161,7 +167,7 @@ class CountryRepositoryRoomTest {
         assertEquals(CountryCatalogStatus(1, 100L), repositoryForStatus().getCatalogStatus().getOrThrow())
         source.saveSyncedCountries(
             listOf(entity("UA", "Ukraine", "Updated Kyiv"), entity("FR", "France", "Paris")),
-            200L,
+            200L
         )
         assertEquals(CountryCatalogStatus(2, 200L), repositoryForStatus().getCatalogStatus().getOrThrow())
     }
@@ -202,6 +208,11 @@ class CountryRepositoryRoomTest {
         }
     }
 
+    private fun seedDataSource() = CountrySeedDataSource(
+        InstrumentationRegistry.getInstrumentation().targetContext,
+        SeedCatalogParser(NetworkModule.provideJson())
+    )
+
     private fun repositoryForStatus() = OfflineFirstCountryRepository(
         object : CountriesApi {
             override suspend fun getCountries(): List<CountryDto> =
@@ -210,7 +221,8 @@ class CountryRepositoryRoomTest {
         CountryCatalogLocalDataSource(database),
         object : TimeProvider {
             override fun currentTimeMillis(): Long = error("Reading status must not read the clock")
-        }
+        },
+        seedDataSource()
     )
 
     private suspend fun verifyMetadataFailure(previousSyncTime: Long?) {
@@ -242,7 +254,8 @@ class CountryRepositoryRoomTest {
             CountryCatalogLocalDataSource(database),
             object : TimeProvider {
                 override fun currentTimeMillis(): Long = now
-            }
+            },
+            seedDataSource()
         )
         assertEquals(
             CountryRefreshResult.Failure(CountryRefreshFailure.STORAGE),
@@ -272,7 +285,7 @@ class CountryRepositoryRoomTest {
         flags = FlagsDto(
             png = "https://flagcdn.com/w320/${code.lowercase()}.png",
             svg = "https://flagcdn.com/${code.lowercase()}.svg"
-        ),
+        )
     )
 
     private fun entity(code: String, name: String, capital: String) = CountryEntity(

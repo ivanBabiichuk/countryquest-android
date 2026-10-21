@@ -17,4 +17,7 @@ interface CatalogSyncMetadataDao {
 
     @Upsert
     suspend fun upsertMetadata(metadata: CatalogSyncMetadataEntity)
+
+    @Query("DELETE FROM catalog_sync_metadata WHERE id = 1")
+    suspend fun clearMetadata()
 }

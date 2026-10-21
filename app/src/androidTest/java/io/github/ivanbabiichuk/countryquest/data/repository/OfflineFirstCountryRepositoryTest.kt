@@ -1,6 +1,10 @@
 package io.github.ivanbabiichuk.countryquest.data.repository
 
 import androidx.room.Room
+import io.github.ivanbabiichuk.countryquest.app.di.NetworkModule
+import io.github.ivanbabiichuk.countryquest.data.local.seed.CountrySeedDataSource
+import io.github.ivanbabiichuk.countryquest.data.local.seed.SeedCatalogParser
+
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import io.github.ivanbabiichuk.countryquest.core.time.TimeProvider
@@ -413,7 +417,13 @@ class OfflineFirstCountryRepositoryTest {
         clock: TimeProvider = object : TimeProvider {
             override fun currentTimeMillis(): Long = 200L
         }
-    ) = OfflineFirstCountryRepository(api, CountryCatalogLocalDataSource(store.database), clock)
+    ) = OfflineFirstCountryRepository(
+        api, CountryCatalogLocalDataSource(store.database), clock,
+        CountrySeedDataSource(
+            InstrumentationRegistry.getInstrumentation().targetContext,
+            SeedCatalogParser(NetworkModule.provideJson())
+        )
+    )
 
     private class Store(val database: CountryQuestDatabase) {
         fun observeCountries(): Flow<List<CountryEntity>> = database.countryDao().observeCountries()

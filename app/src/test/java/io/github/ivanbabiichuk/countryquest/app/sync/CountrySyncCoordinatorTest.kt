@@ -254,6 +254,104 @@ class CountrySyncCoordinatorTest {
         }
     }
 
+    @Test
+    fun `startup initializes seed before freshness check and API request`() = runBlocking {
+        val repository = FakeRepository()
+        val coordinator = coordinator(repository)
+        coordinator.initialize()
+        coordinator.initialize()
+        assertEquals(listOf("seed", "status", "api"), repository.events)
+        assertEquals(1, repository.initializationCalls)
+    }
+
+    @Test
+    fun `fresh catalog still completes initialization before skipping API`() = runBlocking {
+        val repository = FakeRepository()
+        repository.statusResponse = { Result.success(CountryCatalogStatus(10, NOW)) }
+        coordinator(repository).initialize()
+        assertEquals(listOf("seed", "status"), repository.events)
+    }
+
+    @Test
+    fun `seed failure falls back to API without relying on freshness`() = runBlocking {
+        val repository = FakeRepository()
+        repository.initializationResponse = { Result.failure(IOException("Invalid seed")) }
+        repository.statusResponse = { error("Cannot trust freshness after initialization failure") }
+        val coordinator = coordinator(repository)
+        coordinator.initialize()
+        assertEquals(listOf("seed", "api"), repository.events)
+        assertEquals(CountrySyncState(lastResult = success), coordinator.state.value)
+    }
+
+    @Test
+    fun `seed and API failure allow a manual retry of initialization`() = runBlocking {
+        val failure = CountryRefreshResult.Failure(CountryRefreshFailure.NETWORK)
+        val repository = FakeRepository { failure }
+        repository.initializationResponse = { Result.failure(IOException("Unavailable assets")) }
+        val coordinator = coordinator(repository)
+        coordinator.initialize()
+        assertEquals(CountrySyncState(lastResult = failure), coordinator.state.value)
+        repository.initializationResponse = { Result.success(Unit) }
+        repository.response = { success }
+        coordinator.refresh()
+        assertEquals(listOf("seed", "api", "seed", "api"), repository.events)
+        assertEquals(CountrySyncState(lastResult = success), coordinator.state.value)
+    }
+
+    @Test
+    fun `manual refresh initializes before API without freshness lookup`() = runBlocking {
+        val repository = FakeRepository()
+        coordinator(repository).refresh()
+        assertEquals(listOf("seed", "api"), repository.events)
+    }
+
+    @Test
+    fun `initialization holds coordinator lock and busy state before API starts`() = runBlocking {
+        withTimeout(5_000.milliseconds) {
+            val repository = FakeRepository()
+            val entered = CompletableDeferred<Unit>()
+            val release = CompletableDeferred<Unit>()
+            repository.initializationResponse = {
+                entered.complete(Unit)
+                release.await()
+                Result.success(Unit)
+            }
+            val coordinator = coordinator(repository)
+            val request = async { coordinator.initialize() }
+            entered.await()
+            assertTrue(coordinator.state.value.isRefreshing)
+            coordinator.refresh()
+            coordinator.initialize()
+            assertEquals(1, repository.initializationCalls)
+            assertEquals(0, repository.calls)
+            release.complete(Unit)
+            request.await()
+            assertEquals(listOf("seed", "status", "api"), repository.events)
+        }
+    }
+
+    @Test
+    fun `cancelling initialization propagates and allows manual retry`() = runBlocking {
+        withTimeout(5_000.milliseconds) {
+            val repository = FakeRepository()
+            val entered = CompletableDeferred<Unit>()
+            repository.initializationResponse = {
+                entered.complete(Unit)
+                awaitCancellation()
+            }
+            val coordinator = coordinator(repository)
+            val request = async { coordinator.initialize() }
+            entered.await()
+            request.cancelAndJoin()
+            assertTrue(request.isCancelled)
+            assertEquals(CountrySyncState(), coordinator.state.value)
+            assertEquals(0, repository.calls)
+            repository.initializationResponse = { Result.success(Unit) }
+            coordinator.refresh()
+            assertEquals(CountrySyncState(lastResult = success), coordinator.state.value)
+        }
+    }
+
     private fun coordinator(repository: CountryRepository) = CountrySyncCoordinator(
         repository,
         object : TimeProvider {
@@ -265,12 +363,22 @@ class CountrySyncCoordinatorTest {
     private class FakeRepository(
         var response: suspend () -> CountryRefreshResult = { success },
     ) : CountryRepository {
+        val events = mutableListOf<String>()
+        var initializationCalls = 0
+            private set
+        var initializationResponse: suspend () -> Result<Unit> = { Result.success(Unit) }
+        override suspend fun initializeCatalog(): Result<Unit> {
+            events += "seed"
+            initializationCalls++
+            return initializationResponse()
+        }
         var statusCalls = 0
             private set
         var statusResponse: suspend () -> Result<CountryCatalogStatus> = {
             Result.success(CountryCatalogStatus(0, null))
         }
         override suspend fun getCatalogStatus(): Result<CountryCatalogStatus> {
+            events += "status"
             statusCalls++
             return statusResponse()
         }
@@ -281,6 +389,7 @@ class CountrySyncCoordinatorTest {
         override fun observeCountries(): Flow<List<Country>> = flowOf(emptyList())
         override suspend fun getCountries(): List<Country> = emptyList()
         override suspend fun refreshCountries(): CountryRefreshResult {
+            events += "api"
             calls++
             return response()
         }

@@ -420,6 +420,9 @@ class QuizViewModelTest {
         var observationCalls = 0
         var read: suspend () -> List<Country> = { countries }
 
+        override suspend fun initializeCatalog(): Result<Unit> =
+            error("Starting a quiz must not initialize the catalog")
+
         override fun observeCatalogStatus(): Flow<CountryCatalogStatus> =
             error("A quiz must not observe catalog sync status")
 

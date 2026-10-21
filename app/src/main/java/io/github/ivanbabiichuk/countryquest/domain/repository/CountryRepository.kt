@@ -16,4 +16,6 @@ interface CountryRepository {
 
     fun observeCatalogStatus(): Flow<CountryCatalogStatus>
 
+    suspend fun initializeCatalog(): Result<Unit>
+
 }

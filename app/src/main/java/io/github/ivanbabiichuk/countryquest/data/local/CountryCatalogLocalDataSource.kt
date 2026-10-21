@@ -44,4 +44,21 @@ class CountryCatalogLocalDataSource @Inject constructor(
                     ?.lastSuccessfulSyncAtEpochMillis
             )
         }
+
+    suspend fun seedCountriesIfEmpty(countries: List<CountryEntity>): Boolean {
+        require(countries.isNotEmpty()) {
+            "Cannot initialize catalog with an empty seed"
+        }
+
+        return database.withTransaction {
+            if (database.countryDao().getCountriesCount() > 0) {
+                return@withTransaction false
+            }
+
+            database.countryDao().upsertCountries(countries)
+            database.catalogSyncMetadataDao().clearMetadata()
+
+            true
+        }
+    }
 }

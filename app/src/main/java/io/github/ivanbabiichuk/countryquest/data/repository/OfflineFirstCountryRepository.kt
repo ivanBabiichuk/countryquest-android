@@ -3,6 +3,7 @@ package io.github.ivanbabiichuk.countryquest.data.repository
 import android.database.sqlite.SQLiteException
 import io.github.ivanbabiichuk.countryquest.core.time.TimeProvider
 import io.github.ivanbabiichuk.countryquest.data.local.CountryCatalogLocalDataSource
+import io.github.ivanbabiichuk.countryquest.data.local.seed.CountrySeedDataSource
 import io.github.ivanbabiichuk.countryquest.data.mapper.toDomain
 import io.github.ivanbabiichuk.countryquest.data.mapper.toDomainOrNull
 import io.github.ivanbabiichuk.countryquest.data.mapper.toEntity
@@ -25,7 +26,8 @@ import javax.inject.Inject
 class OfflineFirstCountryRepository @Inject constructor(
     private val countriesApi: CountriesApi,
     private val localDataSource: CountryCatalogLocalDataSource,
-    private val timeProvider: TimeProvider
+    private val timeProvider: TimeProvider,
+    private val seedDataSource: CountrySeedDataSource
 ) : CountryRepository {
 
     private val refreshMutex = Mutex()
@@ -97,6 +99,31 @@ class OfflineFirstCountryRepository @Inject constructor(
                 updatedCountries = countries.size,
                 skippedRecords = skippedRecords,
             )
+        }
+
+    override suspend fun initializeCatalog(): Result<Unit> =
+        refreshMutex.withLock {
+            try {
+                val status = localDataSource.getCatalogStatus()
+
+                if (status.countriesCount == 0) {
+                    val seed = seedDataSource.load()
+
+                    localDataSource.seedCountriesIfEmpty(
+                        countries = seed.countries.map { it.toEntity() }
+                    )
+                }
+
+                Result.success(Unit)
+            } catch (ex: SQLiteException) {
+                Result.failure(ex)
+            } catch (ex: IOException) {
+                Result.failure(ex)
+            } catch (ex: SerializationException) {
+                Result.failure(ex)
+            } catch (ex: IllegalArgumentException) {
+                Result.failure(ex)
+            }
         }
 
     private fun failure(reason: CountryRefreshFailure): CountryRefreshResult.Failure =

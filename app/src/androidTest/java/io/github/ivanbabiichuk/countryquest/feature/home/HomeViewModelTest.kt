@@ -295,6 +295,8 @@ class HomeViewModelTest {
     )
 
     private class FakeRepository : CountryRepository {
+        override suspend fun initializeCatalog(): Result<Unit> = Result.success(Unit)
+
         val status = MutableStateFlow(CountryCatalogStatus(0, null))
         val activeObservers = MutableStateFlow(0)
         var observationStarts = 0

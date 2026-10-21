@@ -39,8 +39,11 @@ class CountrySyncCoordinator @Inject constructor(
             if (!force && hasInitialized) return
 
             hasInitialized = true
+            _state.value = CountrySyncState(isRefreshing = true)
 
-            if (!force) {
+            val initialization = countryRepository.initializeCatalog()
+
+            if (!force && initialization.isSuccess) {
                 val status = countryRepository.getCatalogStatus()
                     .getOrElse {
                         _state.value = CountrySyncState(
@@ -53,8 +56,6 @@ class CountrySyncCoordinator @Inject constructor(
                     return
                 }
             }
-
-            _state.value = CountrySyncState(isRefreshing = true)
 
             val result = countryRepository.refreshCountries()
 
